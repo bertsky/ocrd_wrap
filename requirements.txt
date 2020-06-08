@@ -1,0 +1,7 @@
+ocrd>=2.8.3
+click>=7.0
+scipy
+numpy>=1.17.0
+pillow>=6.2.0
+scikit-image
+opencv-python-headless
