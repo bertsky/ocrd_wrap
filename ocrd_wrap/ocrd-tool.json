@@ -109,6 +109,81 @@
                     "description": "For Sauvola/Niblack, formula parameter influencing the threshold bias; larger is lighter foreground"
                 }
             }
+        },
+        "ocrd-skimage-denoise-raw": {
+            "executable": "ocrd-skimage-denoise-raw",
+            "categories": ["Image preprocessing"],
+            "steps": ["preprocessing/despeckling"],
+            "description": "Denoise raw images with Scikit-image",
+            "input_file_grp": [
+                "OCR-D-IMG",
+                "OCR-D-SEG-PAGE",
+                "OCR-D-SEG-REGION",
+                "OCR-D-SEG-LINE"
+            ],
+            "output_file_grp": [
+                "OCR-D-IMG-DEN",
+                "OCR-D-SEG-PAGE-DEN",
+                "OCR-D-SEG-REGION-DEN",
+                "OCR-D-SEG-LINE-DEN"
+            ],
+            "parameters": {
+                "level-of-operation": {
+                    "type": "string",
+                    "enum": ["page","region", "line", "word", "glyph"],
+                    "default": "page",
+                    "description": "PAGE XML hierarchy level to operate on"
+                },
+                "dpi": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "pixel density in dots per inch (overrides any meta-data in the images); disabled when zero",
+                    "default": 0
+		},
+                "method": {
+                    "type": "string",
+                    "default": "VisuShrink",
+                    "enum": ["BayesShrink", "VisuShrink"],
+                    "description": "Wavelet filtering scheme to use"
+                }
+            }
+        },
+        "ocrd-skimage-denoise": {
+            "executable": "ocrd-skimage-denoise",
+            "categories": ["Image preprocessing"],
+            "steps": ["preprocessing/despeckling"],
+            "description": "Denoise binarized images with Scikit-image",
+            "input_file_grp": [
+                "OCR-D-IMG-BIN",
+                "OCR-D-SEG-PAGE-BIN",
+                "OCR-D-SEG-REGION-BIN",
+                "OCR-D-SEG-LINE-BIN"
+            ],
+            "output_file_grp": [
+                "OCR-D-IMG-DEN",
+                "OCR-D-SEG-PAGE-DEN",
+                "OCR-D-SEG-REGION-DEN",
+                "OCR-D-SEG-LINE-DEN"
+            ],
+            "parameters": {
+                "level-of-operation": {
+                    "type": "string",
+                    "enum": ["page","region", "line", "word", "glyph"],
+                    "default": "page",
+                    "description": "PAGE XML hierarchy level to operate on"
+                },
+                "dpi": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "pixel density in dots per inch (overrides any meta-data in the images); disabled when zero",
+                    "default": 0
+		},
+                "maxsize": {
+                    "type": "number",
+                    "default": 3,
+                    "description": "maximum component size of (bg holes or fg specks) noise in pt"
+                }
+            }
         }
     }
 }
