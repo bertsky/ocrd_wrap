@@ -103,6 +103,39 @@ TODO: add example recipes
   * ...
 - ...
 
+### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-normalize`
+
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+
+```
+Usage: ocrd-skimage-normalize [OPTIONS]
+
+  Equalize contrast/exposure of images with Scikit-image
+
+Options:
+  -V, --version                   Show version
+  -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
+                                  Log level
+  -J, --dump-json                 Dump tool description as JSON and exit
+  -p, --parameter TEXT            Parameters, either JSON string or path 
+                                  JSON file
+  -g, --page-id TEXT              ID(s) of the pages to process
+  -O, --output-file-grp TEXT      File group(s) used as output.
+  -I, --input-file-grp TEXT       File group(s) used as input.
+  -w, --working-dir TEXT          Working Directory
+  -m, --mets TEXT                 METS to process
+  -h, --help                      This help message
+
+Parameters:
+  "level-of-operation" [string - page] PAGE XML hierarchy level to
+      operate on Possible values: ["page", "region", "line", "word",
+      "glyph"]
+  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
+      data in the images); disabled when zero
+  "method" [string - stretch] contrast-enhancing transformation to use
+      Possible values: ["stretch", "adapthist"]
+```
+
 ### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-denoise-raw`
 
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.

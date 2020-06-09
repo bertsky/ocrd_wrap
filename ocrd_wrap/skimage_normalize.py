@@ -3,14 +3,9 @@ from __future__ import absolute_import
 import os.path
 from PIL import Image
 import numpy as np
-from skimage.filters import (
-    threshold_niblack,
-    threshold_li,
-    threshold_local,
-    threshold_otsu,
-    threshold_sauvola,
-    threshold_yen
-)
+from skimage import img_as_float
+from skimage.color.adapt_rgb import adapt_rgb, hsv_value
+from skimage.exposure import rescale_intensity, equalize_adapthist
 
 from ocrd import Processor
 from ocrd_utils import (
@@ -28,16 +23,16 @@ from ocrd_models.ocrd_page import (
 )
 from .config import OCRD_TOOL
 
-TOOL = 'ocrd-skimage-binarize'
-LOG = getLogger('processor.SkimageBinarize')
-FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-BIN'
+TOOL = 'ocrd-skimage-normalize'
+LOG = getLogger('processor.SkimageNormalize')
+FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-NRM'
 
-class SkimageBinarize(Processor):
+class SkimageNormalize(Processor):
 
     def __init__(self, *args, **kwargs):
         kwargs['ocrd_tool'] = OCRD_TOOL['tools'][TOOL]
         kwargs['version'] = OCRD_TOOL['version']
-        super(SkimageBinarize, self).__init__(*args, **kwargs)
+        super(SkimageNormalize, self).__init__(*args, **kwargs)
         if hasattr(self, 'output_file_grp'):
             try:
                 self.page_grp, self.image_grp = self.output_file_grp.split(',')
@@ -48,7 +43,7 @@ class SkimageBinarize(Processor):
                          FALLBACK_FILEGRP_IMG)
     
     def process(self):
-        """Performs binarization of segment or page images with Skimage on the workspace.
+        """Performs contrast-enhancing equalization of segment or page images with Skimage on the workspace.
         
         Open and deserialize PAGE input files and their respective images,
         then iterate over the element hierarchy down to the requested
@@ -57,12 +52,12 @@ class SkimageBinarize(Processor):
         For each segment element, retrieve a segment image according to
         the layout annotation (from an existing AlternativeImage, or by
         cropping via coordinates into the higher-level image, and -
-        when applicable - deskewing).
+        when applicable - deskewing), in raw (non-binarized) form.
         
-        Next, binarize the image according to ``method`` with skimage.
+        Next, normalize the image according to ``method`` in skimage.
         
         Then write the new image to the workspace with the fileGrp USE given
-        in the second position of the output fileGrp, or ``OCR-D-IMG-BIN``,
+        in the second position of the output fileGrp, or ``OCR-D-IMG-NRM``,
         and an ID based on input file and input element.
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
@@ -104,14 +99,6 @@ class SkimageBinarize(Processor):
                 else:
                     dpi = 300
                     LOG.info("Page '%s' images will use 300 DPI from fall-back", page_id)
-                # guess a useful window size if not given
-                if not self.parameter['window_size']:
-                    def odd(n):
-                        return int(n) + int((n+1)%2)
-                    # use 1x1 inch square
-                    self.parameter['window_size'] = odd(dpi)
-                if not self.parameter['k']:
-                    self.parameter['k'] = 0.34
                 
                 if oplevel == 'page':
                     self._process_segment(page, page_image, page_coords,
@@ -177,22 +164,33 @@ class SkimageBinarize(Processor):
     
     def _process_segment(self, segment, image, coords, where, page_id, file_id):
         features = coords['features'] # features already applied to image
-        features += ',binarized'
+        features += ',normalized'
         method = self.parameter['method']
-        array = np.array(image.convert('L'))
-        if method == 'otsu':
-            thres = threshold_otsu(array)
-        elif method == 'li':
-            thres = threshold_li(array)
-        elif method == 'yen':
-            thres = threshold_yen(array)
-        elif method == 'gauss':
-            thres = threshold_local(array, self.parameter['window_size'])
-        elif method == 'niblack':
-            thres = threshold_niblack(array, self.parameter['window_size'], self.parameter['k'])
-        elif method == 'sauvola':
-            thres = threshold_sauvola(array, self.parameter['window_size'], self.parameter['k'])
-        array = array > thres
+        LOG.debug("processing %s image size %s mode %s with method %s",
+                  coords['features'], str(image.size), str(image.mode), method)
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
+        elif image.mode == 'LA':
+            image = image.convert('L')
+        rgb = image.mode == 'RGB'
+        array = img_as_float(image)
+        # Estimate the  noise standard deviation across color channels.
+        pctiles = np.percentile(array, (0.2, 99.8), axis=(0,1))
+        LOG.debug(f"2‰ percentiles before: {pctiles}")
+        if method == 'stretch':
+            @adapt_rgb(hsv_value)
+            def normalize(a):
+                # defaults: stretch from in_range='image' to out_range='dtype'
+                v_min, v_max = np.percentile(a, (1.0, 99.0))
+                return rescale_intensity(a, in_range=(v_min, v_max))
+            array = normalize(array)
+        elif method == 'adapthist':
+            # (implicitly does hsv_value when RGB)
+            # defaults: tiles with kernel_size 1/8 width and height
+            array = equalize_adapthist(array)
+        pctiles = np.percentile(array, (0.2, 99.8), axis=(0,1))
+        LOG.debug(f"2‰ percentiles after: {pctiles}")
+        array = np.array(array * 255, np.uint8)
         image = Image.fromarray(array)
         # annotate results
         file_path = self.workspace.save_image_file(

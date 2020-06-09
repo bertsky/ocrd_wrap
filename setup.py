@@ -40,6 +40,7 @@ setup(
             'ocrd-skimage-binarize=ocrd_wrap.cli:ocrd_skimage_binarize',
             'ocrd-skimage-denoise=ocrd_wrap.cli:ocrd_skimage_denoise',
             'ocrd-skimage-denoise-raw=ocrd_wrap.cli:ocrd_skimage_denoise_raw',
+            'ocrd-skimage-normalize=ocrd_wrap.cli:ocrd_skimage_normalize',
         ]
     },
 )

@@ -44,7 +44,7 @@ class SkimageDenoise(Processor):
                          FALLBACK_FILEGRP_IMG)
     
     def process(self):
-        """Performs binary denoising of segments with Skimage on the workspace.
+        """Performs binary denoising of segment or page images with Skimage on the workspace.
         
         Open and deserialize PAGE input files and their respective images,
         then iterate over the element hierarchy down to the requested

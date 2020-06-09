@@ -5,11 +5,17 @@ from .shell import ShellPreprocessor
 from .skimage_binarize import SkimageBinarize
 from .skimage_denoise import SkimageDenoise
 from .skimage_denoise_raw import SkimageDenoiseRaw
+from .skimage_normalize import SkimageNormalize
 
 @click.command()
 @ocrd_cli_options
 def ocrd_process_image(*args, **kwargs):
     return ocrd_cli_wrap_processor(ShellPreprocessor, *args, **kwargs)
+
+@click.command()
+@ocrd_cli_options
+def ocrd_skimage_normalize(*args, **kwargs):
+    return ocrd_cli_wrap_processor(SkimageNormalize, *args, **kwargs)
 
 @click.command()
 @ocrd_cli_options

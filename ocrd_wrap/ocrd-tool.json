@@ -63,7 +63,7 @@
         "ocrd-skimage-binarize": {
             "executable": "ocrd-skimage-binarize",
             "categories": ["Image preprocessing"],
-            "steps": ["preprocessing/binarization"],
+            "steps": ["preprocessing/optimization/binarization"],
             "description": "Binarize images with Scikit-image",
             "input_file_grp": [
                 "OCR-D-IMG",
@@ -113,7 +113,7 @@
         "ocrd-skimage-denoise-raw": {
             "executable": "ocrd-skimage-denoise-raw",
             "categories": ["Image preprocessing"],
-            "steps": ["preprocessing/despeckling"],
+            "steps": ["preprocessing/optimization/despeckling"],
             "description": "Denoise raw images with Scikit-image",
             "input_file_grp": [
                 "OCR-D-IMG",
@@ -151,7 +151,7 @@
         "ocrd-skimage-denoise": {
             "executable": "ocrd-skimage-denoise",
             "categories": ["Image preprocessing"],
-            "steps": ["preprocessing/despeckling"],
+            "steps": ["preprocessing/optimization/despeckling"],
             "description": "Denoise binarized images with Scikit-image",
             "input_file_grp": [
                 "OCR-D-IMG-BIN",
@@ -182,6 +182,44 @@
                     "type": "number",
                     "default": 3,
                     "description": "maximum component size of (bg holes or fg specks) noise in pt"
+                }
+            }
+        },
+        "ocrd-skimage-normalize": {
+            "executable": "ocrd-skimage-normalize",
+            "categories": ["Image preprocessing"],
+            "steps": ["preprocessing/optimization"],
+            "description": "Equalize contrast/exposure of images with Scikit-image",
+            "input_file_grp": [
+                "OCR-D-IMG",
+                "OCR-D-SEG-PAGE",
+                "OCR-D-SEG-REGION",
+                "OCR-D-SEG-LINE"
+            ],
+            "output_file_grp": [
+                "OCR-D-IMG-NRM",
+                "OCR-D-SEG-PAGE-NRM",
+                "OCR-D-SEG-REGION-NRM",
+                "OCR-D-SEG-LINE-NRM"
+            ],
+            "parameters": {
+                "level-of-operation": {
+                    "type": "string",
+                    "enum": ["page","region", "line", "word", "glyph"],
+                    "default": "page",
+                    "description": "PAGE XML hierarchy level to operate on"
+                },
+                "dpi": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "pixel density in dots per inch (overrides any meta-data in the images); disabled when zero",
+                    "default": 0
+		},
+                "method": {
+                    "type": "string",
+                    "default": "stretch",
+                    "enum": ["stretch", "adapthist"],
+                    "description": "contrast-enhancing transformation to use"
                 }
             }
         }

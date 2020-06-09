@@ -42,7 +42,7 @@ class SkimageDenoiseRaw(Processor):
                          FALLBACK_FILEGRP_IMG)
     
     def process(self):
-        """Performs raw denoising of segments with Skimage on the workspace.
+        """Performs raw denoising of segment or page images with Skimage on the workspace.
         
         Open and deserialize PAGE input files and their respective images,
         then iterate over the element hierarchy down to the requested
@@ -172,12 +172,14 @@ class SkimageDenoiseRaw(Processor):
             image = image.convert('RGB')
         elif image.mode == 'LA':
             image = image.convert('L')
+        rgb = image.mode == 'RGB'
         array = img_as_float(image)
         # Estimate the average noise standard deviation across color channels.
-        rgb = image.mode == 'RGB'
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
         LOG.debug(f"estimated sigma before: {sigma_est}")
         array = denoise_wavelet(array, multichannel=rgb, convert2ycbcr=rgb,
+                                # BayesShrink does not seem to do much, but ignores sigma;
+                                # VisuShrink works but tends to underestimate sigma
                                 #sigma=None if method == 'BayesShrink' else sigma_est/4,
                                 method=method, mode='soft', rescale_sigma=True)
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
