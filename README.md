@@ -103,6 +103,43 @@ TODO: add example recipes
   * ...
 - ...
 
+### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-binarize`
+
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+
+```
+Usage: ocrd-skimage-binarize [OPTIONS]
+
+  Binarize images with Scikit-image
+
+Options:
+  -V, --version                   Show version
+  -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
+                                  Log level
+  -J, --dump-json                 Dump tool description as JSON and exit
+  -p, --parameter TEXT            Parameters, either JSON string or path 
+                                  JSON file
+  -g, --page-id TEXT              ID(s) of the pages to process
+  -O, --output-file-grp TEXT      File group(s) used as output.
+  -I, --input-file-grp TEXT       File group(s) used as input.
+  -w, --working-dir TEXT          Working Directory
+  -m, --mets TEXT                 METS to process
+  -h, --help                      This help message
+
+Parameters:
+  "level-of-operation" [string - page] PAGE XML hierarchy level to
+      operate on Possible values: ["page", "region", "line", "word",
+      "glyph"]
+  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
+      data in the images); disabled when zero
+  "method" [string - sauvola] Thresholding algorithm to use Possible
+      values: ["sauvola", "niblack", "otsu", "gauss", "yen", "li"]
+  "window_size" [number - 0] For Sauvola/Niblack/Gauss, the (odd) window
+      size in pixels; when zero (default), set to DPI
+  "k" [number - 0.34] For Sauvola/Niblack, formula parameter influencing
+      the threshold bias; larger is lighter foreground
+```
+
 ## Testing
 
 none yet

@@ -1,6 +1,6 @@
 {
     "git_url": "https://github.com/bertsky/ocrd_wrap",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "tools": {
         "ocrd-process-image": {
             "executable": "ocrd-process-image",
@@ -57,6 +57,56 @@
                     "type": "string",
                     "required": true,
                     "description": "shell command to operate on image files, with @INFILE as place-holder for the input file path, and @OUTFILE as place-holder for the output file path"
+                }
+            }
+        },
+        "ocrd-skimage-binarize": {
+            "executable": "ocrd-skimage-binarize",
+            "categories": ["Image preprocessing"],
+            "steps": ["preprocessing/binarization"],
+            "description": "Binarize images with Scikit-image",
+            "input_file_grp": [
+                "OCR-D-IMG",
+                "OCR-D-SEG-PAGE",
+                "OCR-D-SEG-REGION",
+                "OCR-D-SEG-LINE"
+            ],
+            "output_file_grp": [
+                "OCR-D-IMG-BIN",
+                "OCR-D-SEG-PAGE-BIN",
+                "OCR-D-SEG-REGION-BIN",
+                "OCR-D-SEG-LINE-BIN"
+            ],
+            "parameters": {
+                "level-of-operation": {
+                    "type": "string",
+                    "enum": ["page","region", "line", "word", "glyph"],
+                    "default": "page",
+                    "description": "PAGE XML hierarchy level to operate on"
+                },
+                "dpi": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "pixel density in dots per inch (overrides any meta-data in the images); disabled when zero",
+                    "default": 0
+		},
+                "method": {
+                    "type": "string",
+                    "default": "sauvola",
+                    "enum": ["sauvola", "niblack", "otsu", "gauss", "yen", "li"],
+                    "description": "Thresholding algorithm to use"
+                },
+                "window_size": {
+                    "type": "number",
+                    "format": "integer",
+                    "default": 0,
+                    "description": "For Sauvola/Niblack/Gauss, the (odd) window size in pixels; when zero (default), set to DPI"
+                },
+                "k": {
+                    "type": "number",
+                    "format": "float",
+                    "default": 0.34,
+                    "description": "For Sauvola/Niblack, formula parameter influencing the threshold bias; larger is lighter foreground"
                 }
             }
         }

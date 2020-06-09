@@ -36,6 +36,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ocrd-process-image=ocrd_wrap.cli:ocrd_process_image',
+            'ocrd-skimage-binarize=ocrd_wrap.cli:ocrd_skimage_binarize',
         ]
     },
 )
