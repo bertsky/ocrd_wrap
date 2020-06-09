@@ -21,7 +21,7 @@ from ocrd_models.ocrd_page import (
 )
 from .config import OCRD_TOOL
 
-TOOL = 'ocrd-process-image'
+TOOL = 'ocrd-preprocess-image'
 LOG = getLogger('processor.ShellPreprocessor')
 FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-PROC'
 

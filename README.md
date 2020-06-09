@@ -2,6 +2,17 @@
 
     OCR-D wrapper for arbitrary coords-preserving image operations
 
+  * [Introduction](#introduction)
+  * [Installation](#installation)
+  * [Usage](#usage)
+     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-preprocess-image](#ocr-d-processor-interface-ocrd-preprocess-image)
+     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-normalize](#ocr-d-processor-interface-ocrd-skimage-normalize)
+     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-denoise-raw](#ocr-d-processor-interface-ocrd-skimage-denoise-raw)
+     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-binarize](#ocr-d-processor-interface-ocrd-skimage-binarize)
+     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-denoise](#ocr-d-processor-interface-ocrd-skimage-denoise)
+  * [Testing](#testing)
+
+
 ## Introduction
 
 This offers [OCR-D](https://ocr-d.de) compliant [workspace processors](https://ocr-d.de/en/spec/cli) for
@@ -43,12 +54,12 @@ Which is the equivalent of:
 
 ## Usage
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-process-image`
+### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-preprocess-image`
 
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
 
 ```
-Usage: ocrd-process-image [OPTIONS]
+Usage: ocrd-preprocess-image [OPTIONS]
 
   Convert or enhance images
 

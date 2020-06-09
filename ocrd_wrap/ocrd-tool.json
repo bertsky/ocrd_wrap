@@ -1,9 +1,9 @@
 {
     "git_url": "https://github.com/bertsky/ocrd_wrap",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "tools": {
-        "ocrd-process-image": {
-            "executable": "ocrd-process-image",
+        "ocrd-preprocess-image": {
+            "executable": "ocrd-preprocess-image",
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization"],
             "description": "Convert or enhance images",

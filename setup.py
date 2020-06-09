@@ -1,6 +1,6 @@
 """
 Installs:
-    - ocrd-process-image
+    - ocrd-preprocess-image
     - ocrd-skimage-normalize
     - ocrd-skimage-denoise-raw
     - ocrd-skimage-binarize
@@ -36,7 +36,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'ocrd-process-image=ocrd_wrap.cli:ocrd_process_image',
+            'ocrd-preprocess-image=ocrd_wrap.cli:ocrd_preprocess_image',
             'ocrd-skimage-binarize=ocrd_wrap.cli:ocrd_skimage_binarize',
             'ocrd-skimage-denoise=ocrd_wrap.cli:ocrd_skimage_denoise',
             'ocrd-skimage-denoise-raw=ocrd_wrap.cli:ocrd_skimage_denoise_raw',
