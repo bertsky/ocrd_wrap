@@ -4,6 +4,7 @@ import os.path
 from os import unlink, makedirs
 from tempfile import mkstemp
 import subprocess
+from PIL import Image
 
 from ocrd import Processor
 from ocrd_utils import (
@@ -213,14 +214,19 @@ class ShellPreprocessor(Processor):
             if os.path.exists(out_fname):
                 unlink(out_fname)
             return
+        # check resulting image
+        image2 = Image.open(out_fname)
+        if image.size != image2.size:
+            LOG.error("Command for %s produced image of different size (%s vs %s)",
+                      where, str(image.size), str(image2.size))
+            return
         # annotate results
         self.workspace.add_file(
             ID=out_id,
             local_filename=out_fname,
             file_grp=self.image_grp,
             pageId=page_id,
-            mimetype=output_mime,
-            force=True)
+            mimetype=output_mime)
         LOG.info("created file ID: %s, file_grp: %s, path: %s",
                  out_id, self.image_grp, out_fname)
         segment.add_AlternativeImage(AlternativeImageType(
