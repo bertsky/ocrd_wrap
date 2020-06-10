@@ -1,0 +1,15 @@
+{
+    "input_feature_filter": "binarized",
+    "output_feature_added": "binarized",
+    # (requires Olena/Scribo installed)
+    # k: lower values increase the fg weight; this can
+    # help preserve small/thin text features and thus
+    # retain glyphs as mostly connected components,
+    # but may require binary denoising afterwards to
+    # remove small fg specks
+    # win-size: window tiles always need to include _some_
+    # fg text, otherwise they will magnify background noise;
+    # also, they must be odd-valued;
+    # if unsure, set approximately to your DPI
+    "command": "scribo-cli sauvola-ms-split '@INFILE' '@OUTFILE' --enable-negate-output --k2 0.2 --k3 0.3 --k4 0.5 --win-size 301"
+}

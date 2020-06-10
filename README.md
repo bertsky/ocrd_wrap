@@ -5,11 +5,11 @@
   * [Introduction](#introduction)
   * [Installation](#installation)
   * [Usage](#usage)
-     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-preprocess-image](#ocr-d-processor-interface-ocrd-preprocess-image)
-     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-normalize](#ocr-d-processor-interface-ocrd-skimage-normalize)
-     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-denoise-raw](#ocr-d-processor-interface-ocrd-skimage-denoise-raw)
-     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-binarize](#ocr-d-processor-interface-ocrd-skimage-binarize)
-     * [<a href="https://ocr-d.github.io/cli" rel="nofollow">OCR-D processor</a> interface ocrd-skimage-denoise](#ocr-d-processor-interface-ocrd-skimage-denoise)
+     * [OCR-D processor interface ocrd-preprocess-image](#ocr-d-processor-interface-ocrd-preprocess-image)
+     * [OCR-D processor interface ocrd-skimage-normalize](#ocr-d-processor-interface-ocrd-skimage-normalize)
+     * [OCR-D processor interface ocrd-skimage-denoise-raw](#ocr-d-processor-interface-ocrd-skimage-denoise-raw)
+     * [OCR-D processor interface ocrd-skimage-binarize](#ocr-d-processor-interface-ocrd-skimage-binarize)
+     * [OCR-D processor interface ocrd-skimage-denoise](#ocr-d-processor-interface-ocrd-skimage-denoise)
   * [Testing](#testing)
 
 
@@ -101,10 +101,11 @@ Parameters:
 
 TODO: add example recipes
 - enhancement/conversion/denoising using
-  * ImageMagick `convert`
+  * ImageMagick [convert](ocrd_wrap/param_im6convert-denoise-raw.json)
   * GIMP [script-fu](https://gitlab.gnome.org/GNOME/gimp/-/tree/master/plug-ins/script-fu/scripts)
   * ...
 - binarization using 
+  * [scribo-cli](ocrd_wrap/param_scribo-cli-binarize-sauvola-ms-split.json)
   * https://github.com/ajgallego/document-image-binarization
   * https://github.com/qurator-spk/sbb_binarization
   * https://github.com/masyagin1998/robin

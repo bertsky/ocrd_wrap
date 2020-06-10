@@ -1,0 +1,13 @@
+{
+    "input_feature_filter": "binarized",
+    "output_feature_added": "despeckled,normalized",
+    # requires ImageMagick installed
+    # thresholdxsoftness notation: threshold is crucial,
+    # but may be different for each input image; IM
+    # has no noise level detector;
+    # setting this too large will amplify the noise,
+    # but too low will miss it
+    # normalize equals -contrast-stretch 2%x1%
+    # (i.e. black-out lowest 2% and white-out highest 1%)
+    "command": "convert -wavelet-denoise 0.02%x0.1 '@INFILE' -normalize '@OUTFILE'"
+}

@@ -4,6 +4,10 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+Added:
+
+  * First set of example parameter files for ocrd-preprocess-image
+
 ## [0.0.3] - 2020-06-10
 
 Changed:
