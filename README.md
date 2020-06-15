@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/ocrd_wrap.svg)](https://badge.fury.io/py/ocrd_wrap)
+
 # ocrd_wrap
 
     OCR-D wrapper for arbitrary coords-preserving image operations
@@ -32,6 +34,9 @@ It is itself written in Python, and relies heavily on the
 responsible for handling METS/PAGE, and providing the OCR-D
 CLI.
 
+In addition, this aims to wrap existing Python packages
+for preprocessing as OCR-D processors (one at a time).
+
 ## Installation
 
 Create and activate a [virtual environment](https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments) as usual.
@@ -64,55 +69,64 @@ Usage: ocrd-preprocess-image [OPTIONS]
   Convert or enhance images
 
 Options:
-  -V, --version                   Show version
+  -I, --input-file-grp USE        File group(s) used as input
+  -O, --output-file-grp USE       File group(s) used as output
+  -g, --page-id ID                Physical page ID(s) to process
+  --overwrite                     Remove existing output pages/images
+                                  (with --page-id, remove only those)
+  -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
+                                  or JSON file path
+  -m, --mets URL-PATH             URL or file path of METS to process
+  -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
   -J, --dump-json                 Dump tool description as JSON and exit
-  -p, --parameter TEXT            Parameters, either JSON string or path 
-                                  JSON file
-  -g, --page-id TEXT              ID(s) of the pages to process
-  -O, --output-file-grp TEXT      File group(s) used as output.
-  -I, --input-file-grp TEXT       File group(s) used as input.
-  -w, --working-dir TEXT          Working Directory
-  -m, --mets TEXT                 METS to process
   -h, --help                      This help message
+  -V, --version                   Show version
 
 Parameters:
-  "level-of-operation" [string - page] PAGE XML hierarchy level to operate on
+   "level-of-operation" [string - "page"]
+    PAGE XML hierarchy level to operate on
     Possible values: ["page", "region", "line", "word", "glyph"]
-  "input_feature_selector" [string - ] comma-separated list of required image features
-    (e.g. binarized,despeckled)
-  "input_feature_filter" [string - ] comma-separated list of forbidden image features
-    (e.g. binarized,despeckled)
-  "output_feature_added" [string - REQUIRED] image feature(s) to be added after this operation
-    (if multiple, separate by comma)
-  "input_mimetype" [string - image/png] File format to save input images to
-    (tool's expected input)
-    Possible values: ["image/bmp", "application/postscript", "image/gif", "image/jpeg",
-      "image/jp2", "image/png", "image/x-portable-pixmap", "image/tiff"]
-  "output_mimetype" [string - image/png] File format to load output images from
-    (tool's expected output)
-    Possible values: ["image/bmp", "application/postscript", "image/gif", "image/jpeg",
-      "image/jp2", "image/png", "image/x-portable-pixmap", "image/tiff"]
-  "command" [string - REQUIRED] shell command to operate on image files,
-    with @INFILE as place-holder for the input file path,
-    and @OUTFILE as place-holder for the output file path
+   "input_feature_selector" [string - ""]
+    comma-separated list of required image features (e.g.
+    binarized,despeckled)
+   "input_feature_filter" [string - ""]
+    comma-separated list of forbidden image features (e.g.
+    binarized,despeckled)
+   "output_feature_added" [string - REQUIRED]
+    image feature(s) to be added after this operation (if multiple,
+    separate by comma)
+   "input_mimetype" [string - "image/png"]
+    File format to save input images to (tool's expected input)
+    Possible values: ["image/bmp", "application/postscript", "image/gif",
+    "image/jpeg", "image/jp2", "image/png", "image/x-portable-pixmap",
+    "image/tiff"]
+   "output_mimetype" [string - "image/png"]
+    File format to load output images from (tool's expected output)
+    Possible values: ["image/bmp", "application/postscript", "image/gif",
+    "image/jpeg", "image/jp2", "image/png", "image/x-portable-pixmap",
+    "image/tiff"]
+   "command" [string - REQUIRED]
+    shell command to operate on image files, with @INFILE as place-holder
+    for the input file path, and @OUTFILE as place-holder for the output
+    file path
 ```
 
-TODO: add example recipes
+#### example recipes
 - enhancement/conversion/denoising using
-  * ImageMagick [convert](ocrd_wrap/param_im6convert-denoise-raw.json)
-  * GIMP [script-fu](https://gitlab.gnome.org/GNOME/gimp/-/tree/master/plug-ins/script-fu/scripts)
-  * ...
+  - [x] ImageMagick: [param_im6convert-denoise-raw](ocrd_wrap/param_im6convert-denoise-raw.json)
+  - [ ] GIMP [script-fu](https://gitlab.gnome.org/GNOME/gimp/-/tree/master/plug-ins/script-fu/scripts)
+  - [ ] ...
 - binarization using 
-  * [scribo-cli](ocrd_wrap/param_scribo-cli-binarize-sauvola-ms-split.json)
-  * https://github.com/ajgallego/document-image-binarization
-  * https://github.com/qurator-spk/sbb_binarization
-  * https://github.com/masyagin1998/robin
-  * ...
+  - [x] Olena/Scribo: [param_scribo-cli-binarize-sauvola-ms-split](ocrd_wrap/param_scribo-cli-binarize-sauvola-ms-split.json)
+  - [ ] https://github.com/ajgallego/document-image-binarization ...
+  - [ ] https://github.com/qurator-spk/sbb_binarization ...
+  - [ ] https://github.com/masyagin1998/robin ...
+  - [ ] ...
 - text/non-text segmentation using
-  * Olena `scribo-cli`
-  * ...
+  - [ ] Olena/Scribo ...
+  - [ ] ...
 - ...
 
 ### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-normalize`
@@ -125,27 +139,31 @@ Usage: ocrd-skimage-normalize [OPTIONS]
   Equalize contrast/exposure of images with Scikit-image
 
 Options:
-  -V, --version                   Show version
+  -I, --input-file-grp USE        File group(s) used as input
+  -O, --output-file-grp USE       File group(s) used as output
+  -g, --page-id ID                Physical page ID(s) to process
+  --overwrite                     Remove existing output pages/images
+                                  (with --page-id, remove only those)
+  -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
+                                  or JSON file path
+  -m, --mets URL-PATH             URL or file path of METS to process
+  -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
   -J, --dump-json                 Dump tool description as JSON and exit
-  -p, --parameter TEXT            Parameters, either JSON string or path 
-                                  JSON file
-  -g, --page-id TEXT              ID(s) of the pages to process
-  -O, --output-file-grp TEXT      File group(s) used as output.
-  -I, --input-file-grp TEXT       File group(s) used as input.
-  -w, --working-dir TEXT          Working Directory
-  -m, --mets TEXT                 METS to process
   -h, --help                      This help message
+  -V, --version                   Show version
 
 Parameters:
-  "level-of-operation" [string - page] PAGE XML hierarchy level to
-      operate on Possible values: ["page", "region", "line", "word",
-      "glyph"]
-  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
-      data in the images); disabled when zero
-  "method" [string - stretch] contrast-enhancing transformation to use
-      Possible values: ["stretch", "adapthist"]
+   "level-of-operation" [string - "page"]
+    PAGE XML hierarchy level to operate on
+    Possible values: ["page", "region", "line", "word", "glyph"]
+   "dpi" [number - 0]
+    pixel density in dots per inch (overrides any meta-data in the
+    images); disabled when zero
+   "method" [string - "stretch"]
+    contrast-enhancing transformation to use
+    Possible values: ["stretch", "adapthist"]
 ```
 
 ### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-denoise-raw`
@@ -158,27 +176,31 @@ Usage: ocrd-skimage-denoise-raw [OPTIONS]
   Denoise raw images with Scikit-image
 
 Options:
-  -V, --version                   Show version
+  -I, --input-file-grp USE        File group(s) used as input
+  -O, --output-file-grp USE       File group(s) used as output
+  -g, --page-id ID                Physical page ID(s) to process
+  --overwrite                     Remove existing output pages/images
+                                  (with --page-id, remove only those)
+  -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
+                                  or JSON file path
+  -m, --mets URL-PATH             URL or file path of METS to process
+  -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
   -J, --dump-json                 Dump tool description as JSON and exit
-  -p, --parameter TEXT            Parameters, either JSON string or path 
-                                  JSON file
-  -g, --page-id TEXT              ID(s) of the pages to process
-  -O, --output-file-grp TEXT      File group(s) used as output.
-  -I, --input-file-grp TEXT       File group(s) used as input.
-  -w, --working-dir TEXT          Working Directory
-  -m, --mets TEXT                 METS to process
   -h, --help                      This help message
+  -V, --version                   Show version
 
 Parameters:
-  "level-of-operation" [string - page] PAGE XML hierarchy level to
-      operate on Possible values: ["page", "region", "line", "word",
-      "glyph"]
-  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
-      data in the images); disabled when zero
-  "method" [string - VisuShrink] Wavelet filtering scheme to use
-      Possible values: ["BayesShrink", "VisuShrink"]
+   "level-of-operation" [string - "page"]
+    PAGE XML hierarchy level to operate on
+    Possible values: ["page", "region", "line", "word", "glyph"]
+   "dpi" [number - 0]
+    pixel density in dots per inch (overrides any meta-data in the
+    images); disabled when zero
+   "method" [string - "VisuShrink"]
+    Wavelet filtering scheme to use
+    Possible values: ["BayesShrink", "VisuShrink"]
 ```
 
 ### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-binarize`
@@ -191,31 +213,37 @@ Usage: ocrd-skimage-binarize [OPTIONS]
   Binarize images with Scikit-image
 
 Options:
-  -V, --version                   Show version
+  -I, --input-file-grp USE        File group(s) used as input
+  -O, --output-file-grp USE       File group(s) used as output
+  -g, --page-id ID                Physical page ID(s) to process
+  --overwrite                     Remove existing output pages/images
+                                  (with --page-id, remove only those)
+  -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
+                                  or JSON file path
+  -m, --mets URL-PATH             URL or file path of METS to process
+  -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
   -J, --dump-json                 Dump tool description as JSON and exit
-  -p, --parameter TEXT            Parameters, either JSON string or path 
-                                  JSON file
-  -g, --page-id TEXT              ID(s) of the pages to process
-  -O, --output-file-grp TEXT      File group(s) used as output.
-  -I, --input-file-grp TEXT       File group(s) used as input.
-  -w, --working-dir TEXT          Working Directory
-  -m, --mets TEXT                 METS to process
   -h, --help                      This help message
+  -V, --version                   Show version
 
 Parameters:
-  "level-of-operation" [string - page] PAGE XML hierarchy level to
-      operate on Possible values: ["page", "region", "line", "word",
-      "glyph"]
-  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
-      data in the images); disabled when zero
-  "method" [string - sauvola] Thresholding algorithm to use Possible
-      values: ["sauvola", "niblack", "otsu", "gauss", "yen", "li"]
-  "window_size" [number - 0] For Sauvola/Niblack/Gauss, the (odd) window
-      size in pixels; when zero (default), set to DPI
-  "k" [number - 0.34] For Sauvola/Niblack, formula parameter influencing
-      the threshold bias; larger is lighter foreground
+   "level-of-operation" [string - "page"]
+    PAGE XML hierarchy level to operate on
+    Possible values: ["page", "region", "line", "word", "glyph"]
+   "dpi" [number - 0]
+    pixel density in dots per inch (overrides any meta-data in the
+    images); disabled when zero
+   "method" [string - "sauvola"]
+    Thresholding algorithm to use
+    Possible values: ["sauvola", "niblack", "otsu", "gauss", "yen", "li"]
+   "window_size" [number - 0]
+    For Sauvola/Niblack/Gauss, the (odd) window size in pixels; when zero
+    (default), set to DPI
+   "k" [number - 0.34]
+    For Sauvola/Niblack, formula parameter influencing the threshold
+    bias; larger is lighter foreground
 ```
 
 ### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-denoise`
@@ -228,27 +256,30 @@ Usage: ocrd-skimage-denoise [OPTIONS]
   Denoise binarized images with Scikit-image
 
 Options:
-  -V, --version                   Show version
+  -I, --input-file-grp USE        File group(s) used as input
+  -O, --output-file-grp USE       File group(s) used as output
+  -g, --page-id ID                Physical page ID(s) to process
+  --overwrite                     Remove existing output pages/images
+                                  (with --page-id, remove only those)
+  -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
+                                  or JSON file path
+  -m, --mets URL-PATH             URL or file path of METS to process
+  -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
   -J, --dump-json                 Dump tool description as JSON and exit
-  -p, --parameter TEXT            Parameters, either JSON string or path 
-                                  JSON file
-  -g, --page-id TEXT              ID(s) of the pages to process
-  -O, --output-file-grp TEXT      File group(s) used as output.
-  -I, --input-file-grp TEXT       File group(s) used as input.
-  -w, --working-dir TEXT          Working Directory
-  -m, --mets TEXT                 METS to process
   -h, --help                      This help message
+  -V, --version                   Show version
 
 Parameters:
-  "level-of-operation" [string - page] PAGE XML hierarchy level to
-      operate on Possible values: ["page", "region", "line", "word",
-      "glyph"]
-  "dpi" [number - 0] pixel density in dots per inch (overrides any meta-
-      data in the images); disabled when zero
-  "maxsize" [number - 3] maximum component size of (bg hole or fg speck)
-      noise in pt
+   "level-of-operation" [string - "page"]
+    PAGE XML hierarchy level to operate on
+    Possible values: ["page", "region", "line", "word", "glyph"]
+   "dpi" [number - 0]
+    pixel density in dots per inch (overrides any meta-data in the
+    images); disabled when zero
+   "maxsize" [number - 3]
+    maximum component size of (bg holes or fg specks) noise in pt
 ```
 
 ## Testing
