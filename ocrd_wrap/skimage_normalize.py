@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import os.path
 from PIL import Image
 import numpy as np
-from skimage import img_as_float
+from skimage import img_as_float, img_as_uint, img_as_ubyte
 from skimage.color.adapt_rgb import adapt_rgb, hsv_value
 from skimage.exposure import rescale_intensity, equalize_adapthist
 
@@ -190,7 +190,10 @@ class SkimageNormalize(Processor):
             array = equalize_adapthist(array)
         pctiles = np.percentile(array, (0.2, 99.8), axis=(0,1))
         LOG.debug(f"2‰ percentiles after: {pctiles}")
-        array = np.array(array * 255, np.uint8)
+        if image.mode in ['F', 'I']:
+            array = img_as_uint(array)
+        else:
+            array = img_as_ubyte(array)
         image = Image.fromarray(array)
         # annotate results
         file_path = self.workspace.save_image_file(

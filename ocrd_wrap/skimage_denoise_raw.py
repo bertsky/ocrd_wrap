@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import os.path
 from PIL import Image
 import numpy as np
-from skimage import img_as_float
+from skimage import img_as_uint, img_as_ubyte
 from skimage.restoration import denoise_wavelet, estimate_sigma
 
 from ocrd import Processor
@@ -173,7 +173,7 @@ class SkimageDenoiseRaw(Processor):
         elif image.mode == 'LA':
             image = image.convert('L')
         rgb = image.mode == 'RGB'
-        array = img_as_float(image)
+        array = img_as_uint(image)
         # Estimate the average noise standard deviation across color channels.
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
         LOG.debug(f"estimated sigma before: {sigma_est}")
@@ -184,7 +184,10 @@ class SkimageDenoiseRaw(Processor):
                                 method=method, mode='soft', rescale_sigma=True)
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
         LOG.debug(f"estimated sigma after: {sigma_est}")
-        array = np.array(array * 255, np.uint8)
+        if image.mode in ['F', 'I']:
+            array = img_as_uint(array)
+        else:
+            array = img_as_ubyte(array)
         image = Image.fromarray(array)
         # annotate results
         file_path = self.workspace.save_image_file(
