@@ -177,6 +177,9 @@ class SkimageDenoiseRaw(Processor):
         # Estimate the average noise standard deviation across color channels.
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
         LOG.debug(f"estimated sigma before: {sigma_est}")
+        if sigma_est < 1e-5:
+            # avoid adverse effects of denoising already clean images
+            return
         array = denoise_wavelet(array, multichannel=rgb, convert2ycbcr=rgb,
                                 # BayesShrink does not seem to do much, but ignores sigma;
                                 # VisuShrink works but tends to underestimate sigma
