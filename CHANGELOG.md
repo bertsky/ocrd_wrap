@@ -4,6 +4,15 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.0.5] - 2020-07-08
+
+Fixed:
+
+ * update requirements (needs newer `ocrd, skimage, pillow`)
+ * all: fix typo in `level-of-operation=region`
+ * `ocrd-skimage-denoise-raw`: skip images with too little noise
+ * `ocrd-skimage-*`: preserve color depth in image format
+
 ## [0.0.4] - 2020-06-10
 
 Changed:
