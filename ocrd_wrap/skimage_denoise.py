@@ -11,9 +11,7 @@ from skimage.morphology import (
 from ocrd import Processor
 from ocrd_utils import (
     getLogger, concat_padded,
-    MIMETYPE_PAGE,
-    MIME_TO_PIL,
-    MIME_TO_EXT
+    MIMETYPE_PAGE
 )
 from ocrd_modelfactory import page_from_file
 from ocrd_models.ocrd_page import (
@@ -119,7 +117,7 @@ class SkimageDenoise(Processor):
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords, maxsize,
                                               "region '%s'" % region.id, None,
-                                              file_id + '_' + region_id)
+                                              file_id + '_' + region.id)
                         continue
                     lines = region.get_TextLine()
                     if not lines:
@@ -184,3 +182,4 @@ class SkimageDenoise(Processor):
             page_id=page_id)
         segment.add_AlternativeImage(AlternativeImageType(
             filename=file_path, comments=features))
+        LOG.debug("Despeckled image for %s saved as '%s'", where, file_path)

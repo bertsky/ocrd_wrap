@@ -121,7 +121,7 @@ class ShellPreprocessor(Processor):
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords,
                                               "region '%s'" % region.id, None,
-                                              file_id + '_' + region_id)
+                                              file_id + '_' + region.id)
                         continue
                     lines = region.get_TextLine()
                     if not lines:
@@ -199,6 +199,7 @@ class ShellPreprocessor(Processor):
         command = command.replace('@OUTFILE', '"' + out_fname + '"')
         # execute command pattern
         LOG.debug("Running command: '%s'", command)
+        # pylint: disable=subprocess-run-check
         result = subprocess.run(command, shell=True,
                                 universal_newlines=True,
                                 stdout=subprocess.PIPE,

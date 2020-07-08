@@ -10,9 +10,7 @@ from skimage.exposure import rescale_intensity, equalize_adapthist
 from ocrd import Processor
 from ocrd_utils import (
     getLogger, concat_padded,
-    MIMETYPE_PAGE,
-    MIME_TO_PIL,
-    MIME_TO_EXT
+    MIMETYPE_PAGE
 )
 from ocrd_modelfactory import page_from_file
 from ocrd_models.ocrd_page import (
@@ -114,7 +112,7 @@ class SkimageNormalize(Processor):
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords,
                                               "region '%s'" % region.id, None,
-                                              file_id + '_' + region_id)
+                                              file_id + '_' + region.id)
                         continue
                     lines = region.get_TextLine()
                     if not lines:
@@ -175,8 +173,8 @@ class SkimageNormalize(Processor):
         rgb = image.mode == 'RGB'
         array = img_as_float(image)
         # Estimate the  noise standard deviation across color channels.
-        pctiles = np.percentile(array, (0.2, 99.8), axis=(0,1))
-        LOG.debug(f"2‰ percentiles before: {pctiles}")
+        pctiles = np.percentile(array, (0.2, 99.8), axis=(0, 1))
+        LOG.debug("2‰ percentiles before: %s", pctiles)
         if method == 'stretch':
             @adapt_rgb(hsv_value)
             def normalize(a):
@@ -188,8 +186,8 @@ class SkimageNormalize(Processor):
             # (implicitly does hsv_value when RGB)
             # defaults: tiles with kernel_size 1/8 width and height
             array = equalize_adapthist(array)
-        pctiles = np.percentile(array, (0.2, 99.8), axis=(0,1))
-        LOG.debug(f"2‰ percentiles after: {pctiles}")
+        pctiles = np.percentile(array, (0.2, 99.8), axis=(0, 1))
+        LOG.debug("2‰ percentiles after: %s", pctiles)
         if image.mode in ['F', 'I']:
             array = img_as_uint(array)
         else:
@@ -203,3 +201,4 @@ class SkimageNormalize(Processor):
             page_id=page_id)
         segment.add_AlternativeImage(AlternativeImageType(
             filename=file_path, comments=features))
+        LOG.debug("Normalized image for %s saved as '%s'", where, file_path)

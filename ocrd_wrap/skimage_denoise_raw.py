@@ -2,16 +2,13 @@ from __future__ import absolute_import
 
 import os.path
 from PIL import Image
-import numpy as np
 from skimage import img_as_uint, img_as_ubyte
 from skimage.restoration import denoise_wavelet, estimate_sigma
 
 from ocrd import Processor
 from ocrd_utils import (
     getLogger, concat_padded,
-    MIMETYPE_PAGE,
-    MIME_TO_PIL,
-    MIME_TO_EXT
+    MIMETYPE_PAGE
 )
 from ocrd_modelfactory import page_from_file
 from ocrd_models.ocrd_page import (
@@ -114,7 +111,7 @@ class SkimageDenoiseRaw(Processor):
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords,
                                               "region '%s'" % region.id, None,
-                                              file_id + '_' + region_id)
+                                              file_id + '_' + region.id)
                         continue
                     lines = region.get_TextLine()
                     if not lines:
@@ -176,7 +173,7 @@ class SkimageDenoiseRaw(Processor):
         array = img_as_uint(image)
         # Estimate the average noise standard deviation across color channels.
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
-        LOG.debug(f"estimated sigma before: {sigma_est}")
+        LOG.debug("estimated sigma before: %s", sigma_est)
         if sigma_est < 1e-5:
             # avoid adverse effects of denoising already clean images
             return
@@ -186,7 +183,7 @@ class SkimageDenoiseRaw(Processor):
                                 #sigma=None if method == 'BayesShrink' else sigma_est/4,
                                 method=method, mode='soft', rescale_sigma=True)
         sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
-        LOG.debug(f"estimated sigma after: {sigma_est}")
+        LOG.debug("estimated sigma after: %s", sigma_est)
         if image.mode in ['F', 'I']:
             array = img_as_uint(array)
         else:
@@ -200,3 +197,4 @@ class SkimageDenoiseRaw(Processor):
             page_id=page_id)
         segment.add_AlternativeImage(AlternativeImageType(
             filename=file_path, comments=features))
+        LOG.debug("Denoised image for %s saved as '%s'", where, file_path)
