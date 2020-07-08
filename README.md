@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/ocrd_wrap.svg)](https://badge.fury.io/py/ocrd_wrap)
+[![PyPI version](https://badge.fury.io/py/ocrd-wrap.svg)](https://badge.fury.io/py/ocrd-wrap)
 
 # ocrd_wrap
 
