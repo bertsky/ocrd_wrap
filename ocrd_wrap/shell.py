@@ -216,11 +216,11 @@ class ShellPreprocessor(Processor):
                 unlink(out_fname)
             return
         # check resulting image
-        image2 = Image.open(out_fname)
-        if image.size != image2.size:
-            LOG.error("Command for %s produced image of different size (%s vs %s)",
-                      where, str(image.size), str(image2.size))
-            return
+        with Image.open(out_fname) as image2:
+            if image.size != image2.size:
+                LOG.error("Command for %s produced image of different size (%s vs %s)",
+                          where, str(image.size), str(image2.size))
+                return
         # annotate results
         self.workspace.add_file(
             ID=out_id,
