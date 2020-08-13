@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import os.path
-from os import unlink, makedirs
+from os import close, unlink, makedirs
 from tempfile import mkstemp
 import subprocess
 from PIL import Image
@@ -181,7 +181,7 @@ class ShellPreprocessor(Processor):
         input_mime = self.parameter['input_mimetype']
         output_mime = self.parameter['output_mimetype']
         # save retrieved segment image to temporary file
-        _, in_fname = mkstemp(suffix=file_id + MIME_TO_EXT[input_mime])
+        in_fd, in_fname = mkstemp(suffix=file_id + MIME_TO_EXT[input_mime])
         image.save(in_fname, format=MIME_TO_PIL[input_mime])
         # prepare output file name
         out_id = file_id + '_' + feature_added
@@ -204,6 +204,7 @@ class ShellPreprocessor(Processor):
                                 universal_newlines=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
+        close(in_fd)
         unlink(in_fname)
         LOG.debug("Command for %s returned: %d", where, result.returncode)
         if result.stdout:
