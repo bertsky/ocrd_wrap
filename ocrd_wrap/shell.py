@@ -8,7 +8,9 @@ from PIL import Image
 
 from ocrd import Processor
 from ocrd_utils import (
-    getLogger, concat_padded,
+    getLogger,
+    make_file_id,
+    assert_file_grp_cardinality,
     MIMETYPE_PAGE,
     MIME_TO_PIL,
     MIME_TO_EXT
@@ -24,7 +26,6 @@ from .config import OCRD_TOOL
 
 TOOL = 'ocrd-preprocess-image'
 LOG = getLogger('processor.ShellPreprocessor')
-FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-PROC'
 
 class ShellPreprocessor(Processor):
 
@@ -32,14 +33,6 @@ class ShellPreprocessor(Processor):
         kwargs['ocrd_tool'] = OCRD_TOOL['tools'][TOOL]
         kwargs['version'] = OCRD_TOOL['version']
         super(ShellPreprocessor, self).__init__(*args, **kwargs)
-        if hasattr(self, 'output_file_grp'):
-            try:
-                self.page_grp, self.image_grp = self.output_file_grp.split(',')
-            except ValueError:
-                self.page_grp = self.output_file_grp
-                self.image_grp = FALLBACK_FILEGRP_IMG
-                LOG.info("No output file group for images specified, falling back to '%s'",
-                         FALLBACK_FILEGRP_IMG)
     
     def process(self):
         """Performs coords-preserving image operations via runtime shell calls anywhere.
@@ -68,9 +61,11 @@ class ShellPreprocessor(Processor):
         
         If the shell returns with a failure, skip that segment with an
         approriate error message.
-        Otherwise, add the new image to the workspace with its fileGrp USE
-        attribute given in the second position of the output fileGrp, or
-        ``OCR-D-IMG-PROC``. Reference it as AlternativeImage in the element,
+        Otherwise, add the new image to the workspace along with the
+        output fileGrp, and using a file ID with suffix ``.IMG-``,
+        and further identification of the input element.
+        
+        Reference it as AlternativeImage in the element,
         adding ``output_feature_added`` to its @comments.
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
@@ -83,9 +78,11 @@ class ShellPreprocessor(Processor):
             raise Exception("command parameter requires @INFILE pattern")
         if '@OUTFILE' not in command:
             raise Exception("command parameter requires @OUTFILE pattern")
+        assert_file_grp_cardinality(self.input_file_grp, 1)
+        assert_file_grp_cardinality(self.output_file_grp, 1)
         
         for (n, input_file) in enumerate(self.input_files):
-            file_id = input_file.ID.replace(self.input_file_grp, self.image_grp)
+            file_id = make_file_id(input_file, self.output_file_grp)
             page_id = input_file.pageId or input_file.ID
             LOG.info("INPUT FILE %i / %s", n, page_id)
             pcgts = page_from_file(self.workspace.download_file(input_file))
@@ -158,17 +155,12 @@ class ShellPreprocessor(Processor):
                                                       "glyph '%s'" % glyph.id, None,
                                                       file_id + '_' + glyph.id)
             
-            # Use input_file's basename for the new file -
-            # this way the files retain the same basenames:
-            file_id = input_file.ID.replace(self.input_file_grp, self.page_grp)
-            if file_id == input_file.ID:
-                file_id = concat_padded(self.page_grp, n)
             self.workspace.add_file(
                 ID=file_id,
-                file_grp=self.page_grp,
+                file_grp=self.output_file_grp,
                 pageId=input_file.pageId,
                 mimetype=MIMETYPE_PAGE,
-                local_filename=os.path.join(self.page_grp,
+                local_filename=os.path.join(self.output_file_grp,
                                             file_id + '.xml'),
                 content=to_xml(pcgts))
     
@@ -184,11 +176,11 @@ class ShellPreprocessor(Processor):
         in_fd, in_fname = mkstemp(suffix=file_id + MIME_TO_EXT[input_mime])
         image.save(in_fname, format=MIME_TO_PIL[input_mime])
         # prepare output file name
-        out_id = file_id + '_' + feature_added
-        out_fname = os.path.join(self.image_grp,
+        out_id = file_id + '.IMG-' + feature_added.upper()
+        out_fname = os.path.join(self.output_file_grp,
                                  out_id + MIME_TO_EXT[output_mime])
-        if not os.path.exists(self.image_grp):
-            makedirs(self.image_grp)
+        if not os.path.exists(self.output_file_grp):
+            makedirs(self.output_file_grp)
         # remove quotation around filename patterns, if any
         command = command.replace('"@INFILE"', '@INFILE')
         command = command.replace('"@OUTFILE"', '@OUTFILE')
@@ -226,10 +218,10 @@ class ShellPreprocessor(Processor):
         self.workspace.add_file(
             ID=out_id,
             local_filename=out_fname,
-            file_grp=self.image_grp,
+            file_grp=self.output_file_grp,
             pageId=page_id,
             mimetype=output_mime)
         LOG.info("created file ID: %s, file_grp: %s, path: %s",
-                 out_id, self.image_grp, out_fname)
+                 out_id, self.output_file_grp, out_fname)
         segment.add_AlternativeImage(AlternativeImageType(
             filename=out_fname, comments=features))

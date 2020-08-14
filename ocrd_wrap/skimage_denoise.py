@@ -10,7 +10,9 @@ from skimage.morphology import (
 
 from ocrd import Processor
 from ocrd_utils import (
-    getLogger, concat_padded,
+    getLogger,
+    make_file_id,
+    assert_file_grp_cardinality,
     MIMETYPE_PAGE
 )
 from ocrd_modelfactory import page_from_file
@@ -24,7 +26,6 @@ from .config import OCRD_TOOL
 
 TOOL = 'ocrd-skimage-denoise'
 LOG = getLogger('processor.SkimageDenoise')
-FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-DEN'
 
 class SkimageDenoise(Processor):
 
@@ -32,17 +33,9 @@ class SkimageDenoise(Processor):
         kwargs['ocrd_tool'] = OCRD_TOOL['tools'][TOOL]
         kwargs['version'] = OCRD_TOOL['version']
         super(SkimageDenoise, self).__init__(*args, **kwargs)
-        if hasattr(self, 'output_file_grp'):
-            try:
-                self.page_grp, self.image_grp = self.output_file_grp.split(',')
-            except ValueError:
-                self.page_grp = self.output_file_grp
-                self.image_grp = FALLBACK_FILEGRP_IMG
-                LOG.info("No output file group for images specified, falling back to '%s'",
-                         FALLBACK_FILEGRP_IMG)
     
     def process(self):
-        """Performs binary denoising of segment or page images with Skimage on the workspace.
+        """Performs binary denoising of segment or page images with scikit-image on the workspace.
         
         Open and deserialize PAGE input files and their respective images,
         then iterate over the element hierarchy down to the requested
@@ -56,19 +49,19 @@ class SkimageDenoise(Processor):
         Next, denoise the image by removing too small connected components
         with skimage.
         
-        Then write the new image to the workspace with the fileGrp USE given
-        in the second position of the output fileGrp, or ``OCR-D-IMG-DEN``,
-        and an ID based on input file and input element.
+        Then write the new image to the workspace along with the output fileGrp,
+        and using a file ID with suffix ``.IMG-DEN`` with further identification
+        of the input element.
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
         """
         oplevel = self.parameter['level-of-operation']
+        assert_file_grp_cardinality(self.input_file_grp, 1)
+        assert_file_grp_cardinality(self.output_file_grp, 1)
         
         for (n, input_file) in enumerate(self.input_files):
+            file_id = make_file_id(input_file, self.output_file_grp)
             page_id = input_file.pageId or input_file.ID
-            file_id = input_file.ID.replace(self.input_file_grp, self.image_grp)
-            if file_id == input_file.ID:
-                file_id = concat_padded(self.image_grp, n)
             LOG.info("INPUT FILE %i / %s", n, page_id)
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
@@ -106,7 +99,7 @@ class SkimageDenoise(Processor):
                 if oplevel == 'page':
                     self._process_segment(page, page_image, page_coords, maxsize,
                                           "page '%s'" % page_id, input_file.pageId,
-                                          file_id)
+                                          file_id + '.IMG-DEN')
                     continue
                 regions = page.get_AllRegions(classes=['Text'])
                 if not regions:
@@ -117,7 +110,7 @@ class SkimageDenoise(Processor):
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords, maxsize,
                                               "region '%s'" % region.id, None,
-                                              file_id + '_' + region.id)
+                                              file_id + '.IMG-DEN_' + region.id)
                         continue
                     lines = region.get_TextLine()
                     if not lines:
@@ -128,7 +121,7 @@ class SkimageDenoise(Processor):
                         if oplevel == 'line':
                             self._process_segment(line, line_image, line_coords, maxsize,
                                                   "line '%s'" % line.id, None,
-                                                  file_id + '_' + line.id)
+                                                  file_id + '.IMG-DEN_' + line.id)
                             continue
                         words = line.get_Word()
                         if not words:
@@ -139,7 +132,7 @@ class SkimageDenoise(Processor):
                             if oplevel == 'word':
                                 self._process_segment(word, word_image, word_coords, maxsize,
                                                       "word '%s'" % word.id, None,
-                                                      file_id + '_' + word.id)
+                                                      file_id + '.IMG-DEN_' + word.id)
                                 continue
                             glyphs = word.get_Glyph()
                             if not glyphs:
@@ -149,19 +142,14 @@ class SkimageDenoise(Processor):
                                     glyph, word_image, word_coords, feature_selector='binarized')
                                 self._process_segment(glyph, glyph_image, glyph_coords, maxsize,
                                                       "glyph '%s'" % glyph.id, None,
-                                                      file_id + '_' + glyph.id)
+                                                      file_id + '.IMG-DEN_' + glyph.id)
             
-            # Use input_file's basename for the new file -
-            # this way the files retain the same basenames:
-            file_id = input_file.ID.replace(self.input_file_grp, self.page_grp)
-            if file_id == input_file.ID:
-                file_id = concat_padded(self.page_grp, n)
             self.workspace.add_file(
                 ID=file_id,
-                file_grp=self.page_grp,
+                file_grp=self.output_file_grp,
                 pageId=input_file.pageId,
                 mimetype=MIMETYPE_PAGE,
-                local_filename=os.path.join(self.page_grp,
+                local_filename=os.path.join(self.output_file_grp,
                                             file_id + '.xml'),
                 content=to_xml(pcgts))
     
@@ -178,7 +166,7 @@ class SkimageDenoise(Processor):
         file_path = self.workspace.save_image_file(
             image,
             file_id,
-            file_grp=self.image_grp,
+            file_grp=self.output_file_grp,
             page_id=page_id)
         segment.add_AlternativeImage(AlternativeImageType(
             filename=file_path, comments=features))

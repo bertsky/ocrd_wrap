@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.0] - 2020-08-14
+
+Changed:
+
+ * put derived images under output fileGrp, using file ID suffixes
+
 ## [0.0.5] - 2020-07-08
 
 Fixed:
