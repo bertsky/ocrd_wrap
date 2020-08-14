@@ -139,6 +139,7 @@ class SkimageNormalize(Processor):
                                                       "glyph '%s'" % glyph.id, None,
                                                       file_id + '.IMG-NRM_' + glyph.id)
             
+            pcgts.set_pcGtsId(file_id)
             self.workspace.add_file(
                 ID=file_id,
                 file_grp=self.output_file_grp,
