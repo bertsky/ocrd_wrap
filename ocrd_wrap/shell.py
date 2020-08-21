@@ -177,7 +177,7 @@ class ShellPreprocessor(Processor):
         in_fd, in_fname = mkstemp(suffix=file_id + MIME_TO_EXT[input_mime])
         image.save(in_fname, format=MIME_TO_PIL[input_mime])
         # prepare output file name
-        out_id = file_id + '.IMG-' + feature_added.upper()
+        out_id = file_id + '.IMG-' + feature_added.upper().replace(',', '-')
         out_fname = os.path.join(self.output_file_grp,
                                  out_id + MIME_TO_EXT[output_mime])
         if not os.path.exists(self.output_file_grp):
