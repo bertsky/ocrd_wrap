@@ -11,10 +11,10 @@ help:
 
 # Install Python deps via pip
 deps:
-        $(PIP) install -r requirements.txt
+	$(PIP) install -r requirements.txt
 
 # Install Python package via pip
 install:
-        $(PIP) install .
+	$(PIP) install .
 
 .PHONY: help deps install
