@@ -4,9 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.1] - 2020-09-24
+
 Fixed:
 
  * set pcGtsId to METS file ID everwhere
+ * logging according to OCR-D/core#599
 
 ## [0.1.0] - 2020-08-14
 
