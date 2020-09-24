@@ -25,7 +25,6 @@ from ocrd_models.ocrd_page import (
 from .config import OCRD_TOOL
 
 TOOL = 'ocrd-preprocess-image'
-LOG = getLogger('processor.ShellPreprocessor')
 
 class ShellPreprocessor(Processor):
 
@@ -70,6 +69,7 @@ class ShellPreprocessor(Processor):
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
         """
+        LOG = getLogger('processor.ShellPreprocessor')
         oplevel = self.parameter['level-of-operation']
         feature_selector = self.parameter['input_feature_selector']
         feature_filter = self.parameter['input_feature_filter']
@@ -166,6 +166,7 @@ class ShellPreprocessor(Processor):
                 content=to_xml(pcgts))
     
     def _process_segment(self, segment, image, coords, where, page_id, file_id):
+        LOG = getLogger('processor.ShellPreprocessor')
         features = coords['features'] # features already applied to image
         feature_added = self.parameter['output_feature_added']
         if feature_added:
