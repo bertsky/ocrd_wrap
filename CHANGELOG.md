@@ -4,9 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.1] - 2020-09-24
+
 Fixed:
 
  * set pcGtsId to METS file ID everwhere
+ * logging according to OCR-D/core#599
 
 ## [0.1.0] - 2020-08-14
 
@@ -57,3 +60,12 @@ Added:
 Added:
 
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
+
+<!-- link-labels -->
+[0.1.1]: v0.1.0...v0.1.1
+[0.1.0]: v0.0.5...v0.1.0
+[0.0.5]: v0.0.4...v0.0.5
+[0.0.4]: v0.0.3...v0.0.4
+[0.0.3]: v0.0.2...v0.0.3
+[0.0.2]: v0.0.1...v0.0.2
+[0.0.1]: ../../compare/HEAD...v0.0.1

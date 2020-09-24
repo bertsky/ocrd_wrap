@@ -1,6 +1,6 @@
 {
     "git_url": "https://github.com/bertsky/ocrd_wrap",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "tools": {
         "ocrd-preprocess-image": {
             "executable": "ocrd-preprocess-image",
