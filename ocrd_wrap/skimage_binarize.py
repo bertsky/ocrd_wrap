@@ -29,7 +29,6 @@ from ocrd_models.ocrd_page import (
 from .config import OCRD_TOOL
 
 TOOL = 'ocrd-skimage-binarize'
-LOG = getLogger('processor.SkimageBinarize')
 
 class SkimageBinarize(Processor):
 
@@ -58,6 +57,7 @@ class SkimageBinarize(Processor):
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
         """
+        LOG = getLogger('processor.SkimageBinarize')
         oplevel = self.parameter['level-of-operation']
         assert_file_grp_cardinality(self.input_file_grp, 1)
         assert_file_grp_cardinality(self.output_file_grp, 1)
@@ -163,6 +163,7 @@ class SkimageBinarize(Processor):
                 content=to_xml(pcgts))
     
     def _process_segment(self, segment, image, coords, where, page_id, file_id):
+        LOG = getLogger('processor.SkimageBinarize')
         features = coords['features'] # features already applied to image
         features += ',binarized'
         method = self.parameter['method']

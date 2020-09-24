@@ -22,7 +22,6 @@ from ocrd_models.ocrd_page import (
 from .config import OCRD_TOOL
 
 TOOL = 'ocrd-skimage-denoise-raw'
-LOG = getLogger('processor.SkimageDenoiseRaw')
 
 class SkimageDenoiseRaw(Processor):
 
@@ -52,6 +51,7 @@ class SkimageDenoiseRaw(Processor):
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
         """
+        LOG = getLogger('processor.SkimageDenoiseRaw')
         oplevel = self.parameter['level-of-operation']
         assert_file_grp_cardinality(self.input_file_grp, 1)
         assert_file_grp_cardinality(self.output_file_grp, 1)
@@ -149,6 +149,7 @@ class SkimageDenoiseRaw(Processor):
                 content=to_xml(pcgts))
     
     def _process_segment(self, segment, image, coords, where, page_id, file_id):
+        LOG = getLogger('processor.SkimageDenoiseRaw')
         features = coords['features'] # features already applied to image
         features += ',despeckled'
         method = self.parameter['method']

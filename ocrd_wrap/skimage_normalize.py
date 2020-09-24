@@ -24,7 +24,6 @@ from ocrd_models.ocrd_page import (
 from .config import OCRD_TOOL
 
 TOOL = 'ocrd-skimage-normalize'
-LOG = getLogger('processor.SkimageNormalize')
 
 class SkimageNormalize(Processor):
 
@@ -53,9 +52,10 @@ class SkimageNormalize(Processor):
         
         Produce a new PAGE output file by serialising the resulting hierarchy.
         """
-        oplevel = self.parameter['level-of-operation']
+        LOG = getLogger('processor.SkimageNormalize')
         assert_file_grp_cardinality(self.input_file_grp, 1)
         assert_file_grp_cardinality(self.output_file_grp, 1)
+        oplevel = self.parameter['level-of-operation']
         
         for (n, input_file) in enumerate(self.input_files):
             file_id = make_file_id(input_file, self.output_file_grp)
@@ -150,6 +150,7 @@ class SkimageNormalize(Processor):
                 content=to_xml(pcgts))
     
     def _process_segment(self, segment, image, coords, where, page_id, file_id):
+        LOG = getLogger('processor.SkimageNormalize')
         features = coords['features'] # features already applied to image
         features += ',normalized'
         method = self.parameter['method']
