@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.2] - 2020-10-13
+
+Changed:
+
+ * `skimage-normalize`: expose black/white-point parameters
+
 ## [0.1.1] - 2020-09-24
 
 Fixed:
