@@ -154,8 +154,11 @@ class SkimageNormalize(Processor):
         features = coords['features'] # features already applied to image
         features += ',normalized'
         method = self.parameter['method']
-        LOG.debug("processing %s image size %s mode %s with method %s",
-                  coords['features'], str(image.size), str(image.mode), method)
+        black_point = self.parameter['black-point']
+        white_point = self.parameter['white-point']
+        LOG.debug("processing %s image size %s mode %s with method %s [%.1f..%.1f]",
+                  coords['features'], str(image.size), str(image.mode),
+                  method, black_point, 100 - white_point)
         if image.mode == 'RGBA':
             image = image.convert('RGB')
         elif image.mode == 'LA':
@@ -169,13 +172,14 @@ class SkimageNormalize(Processor):
             @adapt_rgb(hsv_value)
             def normalize(a):
                 # defaults: stretch from in_range='image' to out_range='dtype'
-                v_min, v_max = np.percentile(a, (1.0, 99.0))
+                v_min, v_max = np.percentile(a, (black_point, 100 - white_point))
                 return rescale_intensity(a, in_range=(v_min, v_max))
             array = normalize(array)
         elif method == 'adapthist':
             # (implicitly does hsv_value when RGB)
             # defaults: tiles with kernel_size 1/8 width and height
-            array = equalize_adapthist(array)
+            limit = min(black_point, white_point) / 100
+            array = equalize_adapthist(array, clip_limit=limit)
         pctiles = np.percentile(array, (0.2, 99.8), axis=(0, 1))
         LOG.debug("2‰ percentiles after: %s", pctiles)
         if image.mode in ['F', 'I']:
