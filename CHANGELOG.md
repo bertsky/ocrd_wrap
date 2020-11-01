@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.3] - 2020-11-01
+
+Fixed:
+
+ * all: add pageId for sub-page-level derived images, too
+
 ## [0.1.2] - 2020-10-13
 
 Changed:
