@@ -1,4 +1,4 @@
-ocrd>=2.13
+ocrd>=2.18
 click>=7.0
 scipy
 numpy>=1.17.0

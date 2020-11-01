@@ -59,14 +59,50 @@ Which is the equivalent of:
 
 ## Usage
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-preprocess-image`
+### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-preprocess-image`
 
-To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
 Usage: ocrd-preprocess-image [OPTIONS]
 
   Convert or enhance images
+
+  > Performs coords-preserving image operations via runtime shell calls
+  > anywhere.
+
+  > Open and deserialize PAGE input files and their respective images,
+  > then iterate over the element hierarchy down to the requested
+  > ``level-of-operation`` in the element hierarchy.
+
+  > For each segment element, retrieve a segment image according to the
+  > layout annotation (from an existing AlternativeImage, or by cropping
+  > via coordinates into the higher-level image, and - when applicable -
+  > deskewing.
+
+  > If ``input_feature_selector`` and/or ``input_feature_filter`` is
+  > non-empty, then select/filter among the @imageFilename image and the
+  > available AlternativeImages the last one which contains all of the
+  > selected, but none of the filtered features (i.e. @comments
+  > classes), or raise an error.
+
+  > Then write that image into a temporary PNG file, create a new METS
+  > file ID for the result image (based on the segment ID and the
+  > operation to be run), along with a local path for it, and pass
+  > ``command`` to the shell after replacing: - the string ``@INFILE``
+  > with that input image path, and - the string ``@OUTFILE`` with that
+  > output image path.
+
+  > If the shell returns with a failure, skip that segment with an
+  > approriate error message. Otherwise, add the new image to the
+  > workspace along with the output fileGrp, and using a file ID with
+  > suffix ``.IMG-``, and further identification of the input element.
+
+  > Reference it as AlternativeImage in the element, adding
+  > ``output_feature_added`` to its @comments.
+
+  > Produce a new PAGE output file by serialising the resulting
+  > hierarchy.
 
 Options:
   -I, --input-file-grp USE        File group(s) used as input
@@ -76,6 +112,8 @@ Options:
                                   (with --page-id, remove only those)
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
+  -P, --param-override KEY VAL    Override a single JSON object key-value pair,
+                                  taking precedence over --parameter
   -m, --mets URL-PATH             URL or file path of METS to process
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
@@ -113,7 +151,9 @@ Parameters:
     file path
 ```
 
-#### example recipes
+#### presets
+
+The following example recipes are included in the distribution:
 - enhancement/conversion/denoising using
   - [x] ImageMagick: [param_im6convert-denoise-raw](ocrd_wrap/param_im6convert-denoise-raw.json)
   - [ ] GIMP [script-fu](https://gitlab.gnome.org/GNOME/gimp/-/tree/master/plug-ins/script-fu/scripts)
@@ -129,14 +169,35 @@ Parameters:
   - [ ] ...
 - ...
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-normalize`
+### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-skimage-normalize`
 
-To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
 Usage: ocrd-skimage-normalize [OPTIONS]
 
-  Equalize contrast/exposure of images with Scikit-image
+  Equalize contrast/exposure of images with Scikit-image; stretches the color value/tone to the full dynamic range
+
+  > Performs contrast-enhancing equalization of segment or page images
+  > with scikit-image on the workspace.
+
+  > Open and deserialize PAGE input files and their respective images,
+  > then iterate over the element hierarchy down to the requested
+  > ``level-of-operation`` in the element hierarchy.
+
+  > For each segment element, retrieve a segment image according to the
+  > layout annotation (from an existing AlternativeImage, or by cropping
+  > via coordinates into the higher-level image, and - when applicable -
+  > deskewing), in raw (non-binarized) form.
+
+  > Next, normalize the image according to ``method`` in skimage.
+
+  > Then write the new image to the workspace along with the output
+  > fileGrp, and using a file ID with suffix ``.IMG-NRM`` with further
+  > identification of the input element.
+
+  > Produce a new PAGE output file by serialising the resulting
+  > hierarchy.
 
 Options:
   -I, --input-file-grp USE        File group(s) used as input
@@ -146,6 +207,8 @@ Options:
                                   (with --page-id, remove only those)
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
+  -P, --param-override KEY VAL    Override a single JSON object key-value pair,
+                                  taking precedence over --parameter
   -m, --mets URL-PATH             URL or file path of METS to process
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
@@ -161,19 +224,53 @@ Parameters:
    "dpi" [number - 0]
     pixel density in dots per inch (overrides any meta-data in the
     images); disabled when zero
+   "black-point" [number - 1.0]
+    black point point in percent of luminance/value/tone histogram; up to
+    ``black-point`` darkest pixels will be clipped to black when
+    stretching
+   "white-point" [number - 7.0]
+    white point in percent of luminance/value/tone histogram; up to
+    ``white-point`` brightest pixels will be clipped to white when
+    stretching
    "method" [string - "stretch"]
-    contrast-enhancing transformation to use
+    contrast-enhancing transformation to use after clipping; ``stretch``
+    uses ``skimage.exposure.rescale_intensity`` (globally linearly
+    stretching to full dynamic range) and ``adapthist`` uses
+    ``skimage.exposure.equalize_adapthist`` (applying over tiles with
+    context from 1/8th of the image's width)
     Possible values: ["stretch", "adapthist"]
 ```
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-denoise-raw`
+### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-skimage-denoise-raw`
 
-To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
 Usage: ocrd-skimage-denoise-raw [OPTIONS]
 
   Denoise raw images with Scikit-image
+
+  > Performs raw denoising of segment or page images with scikit-image
+  > on the workspace.
+
+  > Open and deserialize PAGE input files and their respective images,
+  > then iterate over the element hierarchy down to the requested
+  > ``level-of-operation`` in the element hierarchy.
+
+  > For each segment element, retrieve a segment image according to the
+  > layout annotation (from an existing AlternativeImage, or by cropping
+  > via coordinates into the higher-level image, and - when applicable -
+  > deskewing), in raw (non-binarized) form.
+
+  > Next, denoise the image with a Wavelet transform scheme according to
+  > ``method`` in skimage.
+
+  > Then write the new image to the workspace along with the output
+  > fileGrp, and using a file ID with suffix ``.IMG-DEN`` with further
+  > identification of the input element.
+
+  > Produce a new PAGE output file by serialising the resulting
+  > hierarchy.
 
 Options:
   -I, --input-file-grp USE        File group(s) used as input
@@ -183,6 +280,8 @@ Options:
                                   (with --page-id, remove only those)
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
+  -P, --param-override KEY VAL    Override a single JSON object key-value pair,
+                                  taking precedence over --parameter
   -m, --mets URL-PATH             URL or file path of METS to process
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
@@ -203,14 +302,35 @@ Parameters:
     Possible values: ["BayesShrink", "VisuShrink"]
 ```
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-binarize`
+### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-skimage-binarize`
 
-To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
 Usage: ocrd-skimage-binarize [OPTIONS]
 
   Binarize images with Scikit-image
+
+  > Performs binarization of segment or page images with scikit-image on
+  > the workspace.
+
+  > Open and deserialize PAGE input files and their respective images,
+  > then iterate over the element hierarchy down to the requested
+  > ``level-of-operation`` in the element hierarchy.
+
+  > For each segment element, retrieve a segment image according to the
+  > layout annotation (from an existing AlternativeImage, or by cropping
+  > via coordinates into the higher-level image, and - when applicable -
+  > deskewing).
+
+  > Next, binarize the image according to ``method`` with skimage.
+
+  > Then write the new image to the workspace along with the output
+  > fileGrp, and using a file ID with suffix ``.IMG-BIN`` with further
+  > identification of the input element.
+
+  > Produce a new PAGE output file by serialising the resulting
+  > hierarchy.
 
 Options:
   -I, --input-file-grp USE        File group(s) used as input
@@ -220,6 +340,8 @@ Options:
                                   (with --page-id, remove only those)
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
+  -P, --param-override KEY VAL    Override a single JSON object key-value pair,
+                                  taking precedence over --parameter
   -m, --mets URL-PATH             URL or file path of METS to process
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
@@ -246,14 +368,36 @@ Parameters:
     bias; larger is lighter foreground
 ```
 
-### [OCR-D processor](https://ocr-d.github.io/cli) interface `ocrd-skimage-denoise`
+### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-skimage-denoise`
 
-To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.github.io/) annotation workflow.
+To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
 Usage: ocrd-skimage-denoise [OPTIONS]
 
   Denoise binarized images with Scikit-image
+
+  > Performs binary denoising of segment or page images with scikit-
+  > image on the workspace.
+
+  > Open and deserialize PAGE input files and their respective images,
+  > then iterate over the element hierarchy down to the requested
+  > ``level-of-operation`` in the element hierarchy.
+
+  > For each segment element, retrieve a segment image according to the
+  > layout annotation (from an existing AlternativeImage, or by cropping
+  > via coordinates into the higher-level image, and - when applicable -
+  > deskewing), in binarized form.
+
+  > Next, denoise the image by removing too small connected components
+  > with skimage.
+
+  > Then write the new image to the workspace along with the output
+  > fileGrp, and using a file ID with suffix ``.IMG-DEN`` with further
+  > identification of the input element.
+
+  > Produce a new PAGE output file by serialising the resulting
+  > hierarchy.
 
 Options:
   -I, --input-file-grp USE        File group(s) used as input
@@ -263,6 +407,8 @@ Options:
                                   (with --page-id, remove only those)
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
+  -P, --param-override KEY VAL    Override a single JSON object key-value pair,
+                                  taking precedence over --parameter
   -m, --mets URL-PATH             URL or file path of METS to process
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]

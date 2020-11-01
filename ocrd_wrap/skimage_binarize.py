@@ -21,8 +21,6 @@ from ocrd_utils import (
 )
 from ocrd_modelfactory import page_from_file
 from ocrd_models.ocrd_page import (
-    LabelType, LabelsType,
-    MetadataItemType,
     AlternativeImageType,
     to_xml
 )
@@ -68,18 +66,8 @@ class SkimageBinarize(Processor):
             LOG.info("INPUT FILE %i / %s", n, page_id)
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
+            self.add_metadata(pcgts)
             page = pcgts.get_Page()
-            metadata = pcgts.get_Metadata() # ensured by from_file()
-            metadata.add_MetadataItem(
-                MetadataItemType(type_="processingStep",
-                                 name=self.ocrd_tool['steps'][0],
-                                 value=TOOL,
-                                 Labels=[LabelsType(
-                                     externalModel="ocrd-tool",
-                                     externalId="parameters",
-                                     Label=[LabelType(type_=name,
-                                                      value=self.parameter[name])
-                                            for name in self.parameter.keys()])]))
             
             for page in [page]:
                 page_image, page_coords, page_image_info = self.workspace.image_from_page(
@@ -117,7 +105,7 @@ class SkimageBinarize(Processor):
                         region, page_image, page_coords, feature_filter='binarized')
                     if oplevel == 'region':
                         self._process_segment(region, region_image, region_coords,
-                                              "region '%s'" % region.id, None,
+                                              "region '%s'" % region.id, input_file.pageId,
                                               file_id + '.IMG-BIN_' + region.id)
                         continue
                     lines = region.get_TextLine()
@@ -128,7 +116,7 @@ class SkimageBinarize(Processor):
                             line, region_image, region_coords, feature_filter='binarized')
                         if oplevel == 'line':
                             self._process_segment(line, line_image, line_coords,
-                                                  "line '%s'" % line.id, None,
+                                                  "line '%s'" % line.id, input_file.pageId,
                                                   file_id + '.IMG-BIN_' + line.id)
                             continue
                         words = line.get_Word()
@@ -139,7 +127,7 @@ class SkimageBinarize(Processor):
                                 word, line_image, line_coords, feature_filter='binarized')
                             if oplevel == 'word':
                                 self._process_segment(word, word_image, word_coords,
-                                                      "word '%s'" % word.id, None,
+                                                      "word '%s'" % word.id, input_file.pageId,
                                                       file_id + '.IMG-BIN_' + word.id)
                                 continue
                             glyphs = word.get_Glyph()
@@ -149,7 +137,7 @@ class SkimageBinarize(Processor):
                                 glyph_image, glyph_coords = self.workspace.image_from_segment(
                                     glyph, word_image, word_coords, feature_filter='binarized')
                                 self._process_segment(glyph, glyph_image, glyph_coords,
-                                                      "glyph '%s'" % glyph.id, None,
+                                                      "glyph '%s'" % glyph.id, input_file.pageId,
                                                       file_id + '.IMG-BIN_' + glyph.id)
             
             pcgts.set_pcGtsId(file_id)
