@@ -62,6 +62,7 @@ class SkimageNormalize(Processor):
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
             self.add_metadata(pcgts)
+            page = pcgts.get_Page()
             
             for page in [page]:
                 page_image, page_coords, page_image_info = self.workspace.image_from_page(
