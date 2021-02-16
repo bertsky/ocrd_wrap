@@ -80,6 +80,9 @@ Added:
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
 
 <!-- link-labels -->
+[0.1.4]: ../../compare/v0.1.3...v0.1.4
+[0.1.3]: ../../compare/v0.1.2...v0.1.3
+[0.1.2]: ../../compare/v0.1.1...v0.1.2
 [0.1.1]: ../../compare/v0.1.0...v0.1.1
 [0.1.0]: ../../compare/v0.0.5...v0.1.0
 [0.0.5]: ../../compare/v0.0.4...v0.0.5
