@@ -146,7 +146,7 @@ class SkimageDenoise(Processor):
         LOG = getLogger('processor.SkimageDenoise')
         features = coords['features'] # features already applied to image
         features += ',despeckled'
-        array = np.array(image)
+        array = np.array(image).astype('bool')
         # suppress bg specks in fg (holes in binary-inverted)
         remove_small_objects(array, min_size=maxsize, in_place=True)
         # suppress fg specks in bg (blobs in binary-inverted)
