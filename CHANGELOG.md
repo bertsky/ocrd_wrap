@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.5] - 2021-03-02
+
+Fixed:
+
+* `skimage-denoise`: be robust against wrong color depth in hdr
+
 ## [0.1.4] - 2020-11-03
 
 Fixed:
@@ -80,6 +86,7 @@ Added:
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
 
 <!-- link-labels -->
+[0.1.5]: ../../compare/v0.1.4...v0.1.5
 [0.1.4]: ../../compare/v0.1.3...v0.1.4
 [0.1.3]: ../../compare/v0.1.2...v0.1.3
 [0.1.2]: ../../compare/v0.1.1...v0.1.2
