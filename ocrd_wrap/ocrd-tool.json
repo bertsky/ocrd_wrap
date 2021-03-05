@@ -1,6 +1,6 @@
 {
     "git_url": "https://github.com/bertsky/ocrd_wrap",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "tools": {
         "ocrd-preprocess-image": {
             "executable": "ocrd-preprocess-image",
@@ -185,7 +185,7 @@
                 },
                 "maxsize": {
                     "type": "number",
-                    "default": 3,
+                    "default": 1,
                     "description": "maximum component size of (bg holes or fg specks) noise in pt"
                 }
             }
