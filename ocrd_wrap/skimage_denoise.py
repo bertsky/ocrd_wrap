@@ -84,7 +84,7 @@ class SkimageDenoise(Processor):
                     LOG.info("Page '%s' images will use 300 DPI from fall-back", page_id)
                 maxsize = self.parameter['maxsize'] # in pt
                 maxsize *= dpi/72 # in px
-                #maxsize **= 2 # area
+                maxsize **= 2 # area
                 
                 if oplevel == 'page':
                     self._process_segment(page, page_image, page_coords, maxsize,
