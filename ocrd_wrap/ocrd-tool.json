@@ -178,6 +178,11 @@
                     "description": "pixel density in dots per inch (overrides any meta-data in the images); disabled when zero",
                     "default": 0
 		},
+                "protect": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "avoid removing fg specks near larger fg components"
+                },
                 "maxsize": {
                     "type": "number",
                     "default": 3,

@@ -4,7 +4,8 @@ import os.path
 from PIL import Image
 import numpy as np
 from skimage.morphology import (
-    remove_small_objects,
+    binary_dilation, disk,
+    reconstruction,
     remove_small_holes
 )
 
@@ -44,7 +45,8 @@ class SkimageDenoise(Processor):
         when applicable - deskewing), in binarized form.
         
         Next, denoise the image by removing too small connected components
-        with skimage.
+        with skimage. (If ``protect`` is enabled, then avoid removing specks
+        near large connected components.)
         
         Then write the new image to the workspace along with the output fileGrp,
         and using a file ID with suffix ``.IMG-DEN`` with further identification
@@ -146,12 +148,17 @@ class SkimageDenoise(Processor):
         LOG = getLogger('processor.SkimageDenoise')
         features = coords['features'] # features already applied to image
         features += ',despeckled'
-        array = np.array(image).astype('bool')
+        array = ~np.array(image).astype(np.bool)
         # suppress bg specks in fg (holes in binary-inverted)
-        remove_small_objects(array, min_size=maxsize, in_place=True)
+        array1 = remove_small_holes(array, area_threshold=maxsize)
         # suppress fg specks in bg (blobs in binary-inverted)
-        remove_small_holes(array, area_threshold=maxsize, in_place=True)
-        image = Image.fromarray(array)
+        array2 = ~remove_small_holes(~array1, area_threshold=maxsize)
+        if self.parameter['protect']:
+            # reconstruct fragments of larger objects
+            recons = binary_dilation(array2, disk(np.sqrt(maxsize)/2))
+            recons = reconstruction(recons & array1, array1)
+            array2 |= recons.astype(np.bool)
+        image = Image.fromarray(~array2)
         # annotate results
         file_path = self.workspace.save_image_file(
             image,
