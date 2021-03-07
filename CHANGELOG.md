@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.7] - 2021-03-07
+
+Changed:
+
+* `skimage-denoise`: change option `protect` from bool to pt
+
 ## [0.1.6] - 2021-03-05
 
 Changed:
@@ -93,6 +99,7 @@ Added:
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
 
 <!-- link-labels -->
+[0.1.7]: ../../compare/v0.1.6...v0.1.7
 [0.1.6]: ../../compare/v0.1.5...v0.1.6
 [0.1.5]: ../../compare/v0.1.4...v0.1.5
 [0.1.4]: ../../compare/v0.1.3...v0.1.4
