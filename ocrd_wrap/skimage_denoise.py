@@ -45,8 +45,8 @@ class SkimageDenoise(Processor):
         when applicable - deskewing), in binarized form.
         
         Next, denoise the image by removing too small connected components
-        with skimage. (If ``protect`` is enabled, then avoid removing specks
-        near large connected components.)
+        with skimage. (If ``protect`` is non-zero, then avoid removing specks
+        near large connected components up to that distance.)
         
         Then write the new image to the workspace along with the output fileGrp,
         and using a file ID with suffix ``.IMG-DEN`` with further identification
@@ -58,6 +58,9 @@ class SkimageDenoise(Processor):
         assert_file_grp_cardinality(self.input_file_grp, 1)
         assert_file_grp_cardinality(self.output_file_grp, 1)
         oplevel = self.parameter['level-of-operation']
+        if self.parameter['protect']:
+            assert self.parameter['protect'] <= self.parameter['maxsize'], \
+                "'protect' parameter must not be larger than 'maxsize'"
         
         for (n, input_file) in enumerate(self.input_files):
             file_id = make_file_id(input_file, self.output_file_grp)
@@ -82,12 +85,9 @@ class SkimageDenoise(Processor):
                 else:
                     dpi = 300
                     LOG.info("Page '%s' images will use 300 DPI from fall-back", page_id)
-                maxsize = self.parameter['maxsize'] # in pt
-                maxsize *= dpi/72 # in px
-                maxsize **= 2 # area
                 
                 if oplevel == 'page':
-                    self._process_segment(page, page_image, page_coords, maxsize,
+                    self._process_segment(page, page_image, page_coords, dpi,
                                           "page '%s'" % page_id, input_file.pageId,
                                           file_id + '.IMG-DEN')
                     continue
@@ -98,7 +98,7 @@ class SkimageDenoise(Processor):
                     region_image, region_coords = self.workspace.image_from_segment(
                         region, page_image, page_coords, feature_selector='binarized')
                     if oplevel == 'region':
-                        self._process_segment(region, region_image, region_coords, maxsize,
+                        self._process_segment(region, region_image, region_coords, dpi,
                                               "region '%s'" % region.id, input_file.pageId,
                                               file_id + '.IMG-DEN_' + region.id)
                         continue
@@ -109,7 +109,7 @@ class SkimageDenoise(Processor):
                         line_image, line_coords = self.workspace.image_from_segment(
                             line, region_image, region_coords, feature_selector='binarized')
                         if oplevel == 'line':
-                            self._process_segment(line, line_image, line_coords, maxsize,
+                            self._process_segment(line, line_image, line_coords, dpi,
                                                   "line '%s'" % line.id, input_file.pageId,
                                                   file_id + '.IMG-DEN_' + line.id)
                             continue
@@ -120,7 +120,7 @@ class SkimageDenoise(Processor):
                             word_image, word_coords = self.workspace.image_from_segment(
                                 word, line_image, line_coords, feature_selector='binarized')
                             if oplevel == 'word':
-                                self._process_segment(word, word_image, word_coords, maxsize,
+                                self._process_segment(word, word_image, word_coords, dpi,
                                                       "word '%s'" % word.id, input_file.pageId,
                                                       file_id + '.IMG-DEN_' + word.id)
                                 continue
@@ -130,7 +130,7 @@ class SkimageDenoise(Processor):
                             for glyph in glyphs:
                                 glyph_image, glyph_coords = self.workspace.image_from_segment(
                                     glyph, word_image, word_coords, feature_selector='binarized')
-                                self._process_segment(glyph, glyph_image, glyph_coords, maxsize,
+                                self._process_segment(glyph, glyph_image, glyph_coords, dpi,
                                                       "glyph '%s'" % glyph.id, input_file.pageId,
                                                       file_id + '.IMG-DEN_' + glyph.id)
             
@@ -144,18 +144,23 @@ class SkimageDenoise(Processor):
                                             file_id + '.xml'),
                 content=to_xml(pcgts))
     
-    def _process_segment(self, segment, image, coords, maxsize, where, page_id, file_id):
+    def _process_segment(self, segment, image, coords, dpi, where, page_id, file_id):
         LOG = getLogger('processor.SkimageDenoise')
         features = coords['features'] # features already applied to image
         features += ',despeckled'
+        maxsize = self.parameter['maxsize']
+        maxsize *= dpi/72 # in px instead of pt
+        maxsize **= 2 # area
+        protect = self.parameter['protect']
+        protect *= dpi/72 # in px instead of pt
         array = ~np.array(image).astype(np.bool)
         # suppress bg specks in fg (holes in binary-inverted)
         array1 = remove_small_holes(array, area_threshold=maxsize)
         # suppress fg specks in bg (blobs in binary-inverted)
         array2 = ~remove_small_holes(~array1, area_threshold=maxsize)
-        if self.parameter['protect']:
+        if protect:
             # reconstruct fragments of larger objects
-            recons = binary_dilation(array2, disk(np.sqrt(maxsize)/2))
+            recons = binary_dilation(array2, disk(protect))
             recons = reconstruction(recons & array1, array1)
             array2 |= recons.astype(np.bool)
         image = Image.fromarray(~array2)

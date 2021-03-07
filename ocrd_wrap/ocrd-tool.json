@@ -179,13 +179,15 @@
                     "default": 0
 		},
                 "protect": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "avoid removing fg specks near larger fg components"
+                    "type": "number",
+                    "format": "float",
+                    "default": 0.0,
+                    "description": "avoid removing fg specks near larger fg components by up to this distance in pt"
                 },
                 "maxsize": {
                     "type": "number",
-                    "default": 1,
+                    "format": "float",
+                    "default": 1.0,
                     "description": "maximum component size of (bg holes or fg specks) noise in pt"
                 }
             }
