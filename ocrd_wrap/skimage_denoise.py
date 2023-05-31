@@ -155,6 +155,7 @@ class SkimageDenoise(Processor):
         protect *= dpi/72 # in px instead of pt
         array = np.array(image)
         dtype = array.dtype
+        scale = array.max()
         array = ~array.astype(bool)
         # suppress bg specks in fg (holes in binary-inverted)
         array1 = remove_small_holes(array, area_threshold=maxsize)
@@ -166,7 +167,7 @@ class SkimageDenoise(Processor):
             recons = reconstruction(recons & array1, array1)
             array2 |= recons.astype(bool)
         array = ~array2
-        image = Image.fromarray(array.astype(dtype))
+        image = Image.fromarray(array.astype(dtype) * scale)
         # annotate results
         file_path = self.workspace.save_image_file(
             image,
