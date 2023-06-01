@@ -4,6 +4,13 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.1.8] - 2023-06-01
+
+Fixed:
+
+* `skimage-denoise`: update to changes in Numpy
+* `skimage-denoise`: handle bin+alpha images gracefully
+
 ## [0.1.7] - 2021-03-07
 
 Changed:
@@ -99,6 +106,7 @@ Added:
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
 
 <!-- link-labels -->
+[0.1.8]: ../../compare/v0.1.7...v0.1.8
 [0.1.7]: ../../compare/v0.1.6...v0.1.7
 [0.1.6]: ../../compare/v0.1.5...v0.1.6
 [0.1.5]: ../../compare/v0.1.4...v0.1.5
