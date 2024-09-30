@@ -1,4 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/ocrd-wrap.svg)](https://badge.fury.io/py/ocrd-wrap)
+[![Docker Image CD](https://github.com/bertsky/ocrd_wrap/actions/workflows/docker-image.yml/badge.svg)](https://github.com/bertsky/ocrd_wrap/actions/workflows/docker-image.yml)
 
 # ocrd_wrap
 
@@ -57,6 +58,12 @@ Which is the equivalent of:
 
     pip install .
 
+
+Alternatively, download the prebuilt image from Dockerhub:
+
+    docker pull ocrd/doxa
+
+
 ## Usage
 
 ### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-preprocess-image`
@@ -110,6 +117,8 @@ Options:
   -g, --page-id ID                Physical page ID(s) to process
   --overwrite                     Remove existing output pages/images
                                   (with --page-id, remove only those)
+  --profile                       Enable profiling
+  --profile-file                  Write cProfile stats to this file. Implies --profile
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
@@ -118,7 +127,10 @@ Options:
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
+  -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
+  -L, --list-resources            List names of processor resources
   -J, --dump-json                 Dump tool description as JSON and exit
+  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
   -h, --help                      This help message
   -V, --version                   Show version
 
@@ -169,6 +181,11 @@ The following example recipes are included in the distribution:
   - [ ] ...
 - ...
 
+These presets will be distributed with as package resources and resolve by their filename, e.g. ...
+
+    ocrd-preprocess-image -p param_scribo-cli-binarize-sauvola-ms-split.json -I OCR-D-IMG -O OCR-D-BIN-OLENA
+
+
 ### [OCR-D processor](https://ocr-d.de/en/spec/cli) interface `ocrd-skimage-normalize`
 
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
@@ -205,6 +222,8 @@ Options:
   -g, --page-id ID                Physical page ID(s) to process
   --overwrite                     Remove existing output pages/images
                                   (with --page-id, remove only those)
+  --profile                       Enable profiling
+  --profile-file                  Write cProfile stats to this file. Implies --profile
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
@@ -213,7 +232,10 @@ Options:
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
+  -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
+  -L, --list-resources            List names of processor resources
   -J, --dump-json                 Dump tool description as JSON and exit
+  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
   -h, --help                      This help message
   -V, --version                   Show version
 
@@ -278,6 +300,8 @@ Options:
   -g, --page-id ID                Physical page ID(s) to process
   --overwrite                     Remove existing output pages/images
                                   (with --page-id, remove only those)
+  --profile                       Enable profiling
+  --profile-file                  Write cProfile stats to this file. Implies --profile
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
@@ -286,7 +310,10 @@ Options:
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
+  -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
+  -L, --list-resources            List names of processor resources
   -J, --dump-json                 Dump tool description as JSON and exit
+  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
   -h, --help                      This help message
   -V, --version                   Show version
 
@@ -338,6 +365,8 @@ Options:
   -g, --page-id ID                Physical page ID(s) to process
   --overwrite                     Remove existing output pages/images
                                   (with --page-id, remove only those)
+  --profile                       Enable profiling
+  --profile-file                  Write cProfile stats to this file. Implies --profile
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
@@ -346,7 +375,10 @@ Options:
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
+  -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
+  -L, --list-resources            List names of processor resources
   -J, --dump-json                 Dump tool description as JSON and exit
+  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
   -h, --help                      This help message
   -V, --version                   Show version
 
@@ -405,6 +437,8 @@ Options:
   -g, --page-id ID                Physical page ID(s) to process
   --overwrite                     Remove existing output pages/images
                                   (with --page-id, remove only those)
+  --profile                       Enable profiling
+  --profile-file                  Write cProfile stats to this file. Implies --profile
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
@@ -413,7 +447,10 @@ Options:
   -w, --working-dir PATH          Working directory of local workspace
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
                                   Log level
+  -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
+  -L, --list-resources            List names of processor resources
   -J, --dump-json                 Dump tool description as JSON and exit
+  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
   -h, --help                      This help message
   -V, --version                   Show version
 
