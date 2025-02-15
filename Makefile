@@ -2,6 +2,9 @@ PYTHON = python3
 PIP = pip3
 PYTHONIOENCODING=utf8
 
+DOCKER_BASE_IMAGE = docker.io/ocrd/core:v3.0.3
+DOCKER_TAG = ocrd/wrap
+
 help:
 	@echo
 	@echo "  Targets"
@@ -13,6 +16,7 @@ help:
 	@echo "    build        Build source and binary distribution"
 	@echo "    repo/assets  Clone OCR-D/assets to ./repo/assets"
 	@echo "    tests/assets Setup test assets"
+	@echo "    docker       Build a Docker image $(DOCKER_TAG) from $(DOCKER_BASE_IMAGE)"
 
 # Install Python deps via pip
 deps:
@@ -56,4 +60,11 @@ tests/assets: repo/assets
 	mkdir -p tests/assets
 	cp -a repo/assets/data/* tests/assets
 
-.PHONY: help deps deps-test install install-dev test
+docker:
+	docker build \
+	--build-arg DOCKER_BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
+	--build-arg VCS_REF=$$(git rev-parse --short HEAD) \
+	--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+	-t $(DOCKER_TAG) .
+
+.PHONY: help deps deps-test install install-dev test docker
