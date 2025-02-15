@@ -17,7 +17,7 @@ with codecs.open('README.md', encoding='utf-8') as f:
 
 with open('./ocrd-tool.json', 'r') as f:
     version = json.load(f)['version']
-    
+
 setup(
     name='ocrd_wrap',
     version=version,
