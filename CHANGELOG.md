@@ -4,6 +4,12 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.2.1] - 2025-02-15
+
+Fixed:
+
+* manifest for sdist
+
 ## [0.2.0] - 2025-02-15
 
 Changed:
