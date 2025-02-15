@@ -4,6 +4,17 @@ Versioned according to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [0.2.0] - 2025-02-15
+
+Changed:
+
+* adapted to `ocrd>=3.0`
+* adapted to `scikit-image>=0.19` and `>=0.25`
+
+Added:
+
+* tests and CI
+
 ## [0.1.8] - 2023-06-01
 
 Fixed:
@@ -106,6 +117,7 @@ Added:
   * `ocrd-process-image` (generic shell-wrapped image preprocessor)
 
 <!-- link-labels -->
+[0.2.0]: ../../compare/v0.1.8...v0.2.0
 [0.1.8]: ../../compare/v0.1.7...v0.1.8
 [0.1.7]: ../../compare/v0.1.6...v0.1.7
 [0.1.6]: ../../compare/v0.1.5...v0.1.6
