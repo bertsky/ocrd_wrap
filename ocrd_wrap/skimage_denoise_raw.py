@@ -2,8 +2,9 @@ from __future__ import absolute_import
 
 import os.path
 from typing import Optional
+from packaging.version import Version
 from PIL import Image
-from skimage import img_as_uint, img_as_ubyte
+from skimage import img_as_uint, img_as_ubyte, __version__ as skimage_version
 from skimage.restoration import denoise_wavelet, estimate_sigma
 
 from ocrd import Processor, OcrdPageResult, OcrdPageResultImage
@@ -19,6 +20,18 @@ class SkimageDenoiseRaw(Processor):
     @property
     def executable(self):
         return 'ocrd-skimage-denoise-raw'
+
+    def setup(self):
+        if Version(skimage_version) >= Version('0.19'):
+            def kwargs(rgb: bool) -> dict:
+                if rgb:
+                    return dict(channel_axis=-1, average_sigmas=True)
+                else:
+                    return dict(channel_axis=None, average_sigmas=False)
+        else:
+            def kwargs(rgb: bool) -> dict:
+                return dict(multichannel=rgb, average_sigmas=rgb)
+        self.skimage_kwargs = kwargs
 
     def process_page_pcgts(self, *input_pcgts: Optional[OcrdPage], page_id: Optional[str] = None) -> OcrdPageResult:
         """Performs raw denoising of segment or page images with scikit-image on the workspace.
@@ -123,20 +136,24 @@ class SkimageDenoiseRaw(Processor):
             image = image.convert('RGB')
         elif image.mode == 'LA':
             image = image.convert('L')
-        rgb = image.mode == 'RGB'
+        kwargs = self.skimage_kwargs(image.mode == 'RGB')
+        kwargs2 = dict(kwargs)
+        kwargs2["convert2ycbcr"] = kwargs2.pop("average_sigmas")
         array = img_as_uint(image)
         # Estimate the average noise standard deviation across color channels.
-        sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
+        sigma_est = estimate_sigma(array, **kwargs)
         self.logger.debug("estimated sigma before: %s", sigma_est)
         if sigma_est < 1e-5:
             # avoid adverse effects of denoising already clean images
             return None
-        array = denoise_wavelet(array, multichannel=rgb, convert2ycbcr=rgb,
+        array = denoise_wavelet(array,
                                 # BayesShrink does not seem to do much, but ignores sigma;
                                 # VisuShrink works but tends to underestimate sigma
                                 #sigma=None if method == 'BayesShrink' else sigma_est/4,
-                                method=method, mode='soft', rescale_sigma=True)
-        sigma_est = estimate_sigma(array, multichannel=rgb, average_sigmas=rgb)
+                                method=method, mode='soft', rescale_sigma=True,
+                                **kwargs2
+        )
+        sigma_est = estimate_sigma(array, **kwargs)
         self.logger.debug("estimated sigma after: %s", sigma_est)
         if image.mode in ['F', 'I']:
             array = img_as_uint(array)
