@@ -1,24 +1,15 @@
 {
     "git_url": "https://github.com/bertsky/ocrd_wrap",
-    "version": "0.1.8",
+    "dockerhub": "ocrd/wrap",
+    "version": "0.2.0",
     "tools": {
         "ocrd-preprocess-image": {
             "executable": "ocrd-preprocess-image",
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization"],
             "description": "Convert or enhance images",
-            "input_file_grp": [
-                "OCR-D-IMG",
-                "OCR-D-SEG-PAGE",
-                "OCR-D-SEG-REGION",
-                "OCR-D-SEG-LINE"
-            ],
-            "output_file_grp": [
-                "OCR-D-IMG",
-                "OCR-D-SEG-PAGE",
-                "OCR-D-SEG-REGION",
-                "OCR-D-SEG-LINE"
-            ],
+            "input_file_grp_cardinality": 1,
+            "output_file_grp_cardinality": 1,
             "parameters": {
                 "level-of-operation": {
                     "type": "string",
@@ -65,18 +56,8 @@
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization/binarization"],
             "description": "Binarize images with Scikit-image",
-            "input_file_grp": [
-                "OCR-D-IMG",
-                "OCR-D-SEG-PAGE",
-                "OCR-D-SEG-REGION",
-                "OCR-D-SEG-LINE"
-            ],
-            "output_file_grp": [
-                "OCR-D-IMG-BIN",
-                "OCR-D-SEG-PAGE-BIN",
-                "OCR-D-SEG-REGION-BIN",
-                "OCR-D-SEG-LINE-BIN"
-            ],
+            "input_file_grp_cardinality": 1,
+            "output_file_grp_cardinality": 1,
             "parameters": {
                 "level-of-operation": {
                     "type": "string",
@@ -115,18 +96,8 @@
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization/despeckling"],
             "description": "Denoise raw images with Scikit-image",
-            "input_file_grp": [
-                "OCR-D-IMG",
-                "OCR-D-SEG-PAGE",
-                "OCR-D-SEG-REGION",
-                "OCR-D-SEG-LINE"
-            ],
-            "output_file_grp": [
-                "OCR-D-IMG-DEN",
-                "OCR-D-SEG-PAGE-DEN",
-                "OCR-D-SEG-REGION-DEN",
-                "OCR-D-SEG-LINE-DEN"
-            ],
+            "input_file_grp_cardinality": 1,
+            "output_file_grp_cardinality": 1,
             "parameters": {
                 "level-of-operation": {
                     "type": "string",
@@ -153,18 +124,8 @@
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization/despeckling"],
             "description": "Denoise binarized images with Scikit-image",
-            "input_file_grp": [
-                "OCR-D-IMG-BIN",
-                "OCR-D-SEG-PAGE-BIN",
-                "OCR-D-SEG-REGION-BIN",
-                "OCR-D-SEG-LINE-BIN"
-            ],
-            "output_file_grp": [
-                "OCR-D-IMG-DEN",
-                "OCR-D-SEG-PAGE-DEN",
-                "OCR-D-SEG-REGION-DEN",
-                "OCR-D-SEG-LINE-DEN"
-            ],
+            "input_file_grp_cardinality": 1,
+            "output_file_grp_cardinality": 1,
             "parameters": {
                 "level-of-operation": {
                     "type": "string",
@@ -197,18 +158,8 @@
             "categories": ["Image preprocessing"],
             "steps": ["preprocessing/optimization"],
             "description": "Equalize contrast/exposure of images with Scikit-image; stretches the color value/tone to the full dynamic range",
-            "input_file_grp": [
-                "OCR-D-IMG",
-                "OCR-D-SEG-PAGE",
-                "OCR-D-SEG-REGION",
-                "OCR-D-SEG-LINE"
-            ],
-            "output_file_grp": [
-                "OCR-D-IMG-NRM",
-                "OCR-D-SEG-PAGE-NRM",
-                "OCR-D-SEG-REGION-NRM",
-                "OCR-D-SEG-LINE-NRM"
-            ],
+            "input_file_grp_cardinality": 1,
+            "output_file_grp_cardinality": 1,
             "parameters": {
                 "level-of-operation": {
                     "type": "string",

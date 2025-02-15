@@ -1,4 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/ocrd-wrap.svg)](https://badge.fury.io/py/ocrd-wrap)
+[![Pytest CI](https://github.com/bertsky/ocrd_wrap/actions/workflows/ci.yml/badge.svg)](https://github.com/bertsky/ocrd_wrap/actions/workflows/ci.yml)
 [![Docker Image CD](https://github.com/bertsky/ocrd_wrap/actions/workflows/docker-image.yml/badge.svg)](https://github.com/bertsky/ocrd_wrap/actions/workflows/docker-image.yml)
 
 # ocrd_wrap
@@ -61,7 +62,7 @@ Which is the equivalent of:
 
 Alternatively, download the prebuilt image from Dockerhub:
 
-    docker pull ocrd/doxa
+    docker pull ocrd/wrap
 
 
 ## Usage
@@ -71,7 +72,7 @@ Alternatively, download the prebuilt image from Dockerhub:
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
-Usage: ocrd-preprocess-image [OPTIONS]
+Usage: ocrd-preprocess-image [worker|server] [OPTIONS]
 
   Convert or enhance images
 
@@ -111,27 +112,40 @@ Usage: ocrd-preprocess-image [OPTIONS]
   > Produce a new PAGE output file by serialising the resulting
   > hierarchy.
 
-Options:
+Subcommands:
+    worker      Start a processing worker rather than do local processing
+    server      Start a processor server rather than do local processing
+
+Options for processing:
+  -m, --mets URL-PATH             URL or file path of METS to process [./mets.xml]
+  -w, --working-dir PATH          Working directory of local workspace [dirname(URL-PATH)]
   -I, --input-file-grp USE        File group(s) used as input
   -O, --output-file-grp USE       File group(s) used as output
-  -g, --page-id ID                Physical page ID(s) to process
+  -g, --page-id ID                Physical page ID(s) to process instead of full document []
   --overwrite                     Remove existing output pages/images
-                                  (with --page-id, remove only those)
+                                  (with "--page-id", remove only those).
+                                  Short-hand for OCRD_EXISTING_OUTPUT=OVERWRITE
+  --debug                         Abort on any errors with full stack trace.
+                                  Short-hand for OCRD_MISSING_OUTPUT=ABORT
   --profile                       Enable profiling
-  --profile-file                  Write cProfile stats to this file. Implies --profile
+  --profile-file PROF-PATH        Write cProfile stats to PROF-PATH. Implies "--profile"
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
                                   taking precedence over --parameter
-  -m, --mets URL-PATH             URL or file path of METS to process
-  -w, --working-dir PATH          Working directory of local workspace
+  -U, --mets-server-url URL       URL of a METS Server for parallel incremental access to METS
+                                  If URL starts with http:// start an HTTP server there,
+                                  otherwise URL is a path to an on-demand-created unix socket
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
-                                  Log level
+                                  Override log level globally [INFO]
+  --log-filename LOG-PATH         File to redirect stderr logging to (overriding ocrd_logging.conf).
+
+Options for information:
   -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
   -L, --list-resources            List names of processor resources
-  -J, --dump-json                 Dump tool description as JSON and exit
-  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
-  -h, --help                      This help message
+  -J, --dump-json                 Dump tool description as JSON
+  -D, --dump-module-dir           Show the 'module' resource location path for this processor
+  -h, --help                      Show this message
   -V, --version                   Show version
 
 Parameters:
@@ -191,7 +205,7 @@ These presets will be distributed with as package resources and resolve by their
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
-Usage: ocrd-skimage-normalize [OPTIONS]
+Usage: ocrd-skimage-normalize [worker|server] [OPTIONS]
 
   Equalize contrast/exposure of images with Scikit-image; stretches the color value/tone to the full dynamic range
 
@@ -216,27 +230,40 @@ Usage: ocrd-skimage-normalize [OPTIONS]
   > Produce a new PAGE output file by serialising the resulting
   > hierarchy.
 
-Options:
+Subcommands:
+    worker      Start a processing worker rather than do local processing
+    server      Start a processor server rather than do local processing
+
+Options for processing:
+  -m, --mets URL-PATH             URL or file path of METS to process [./mets.xml]
+  -w, --working-dir PATH          Working directory of local workspace [dirname(URL-PATH)]
   -I, --input-file-grp USE        File group(s) used as input
   -O, --output-file-grp USE       File group(s) used as output
-  -g, --page-id ID                Physical page ID(s) to process
+  -g, --page-id ID                Physical page ID(s) to process instead of full document []
   --overwrite                     Remove existing output pages/images
-                                  (with --page-id, remove only those)
+                                  (with "--page-id", remove only those).
+                                  Short-hand for OCRD_EXISTING_OUTPUT=OVERWRITE
+  --debug                         Abort on any errors with full stack trace.
+                                  Short-hand for OCRD_MISSING_OUTPUT=ABORT
   --profile                       Enable profiling
-  --profile-file                  Write cProfile stats to this file. Implies --profile
+  --profile-file PROF-PATH        Write cProfile stats to PROF-PATH. Implies "--profile"
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
                                   taking precedence over --parameter
-  -m, --mets URL-PATH             URL or file path of METS to process
-  -w, --working-dir PATH          Working directory of local workspace
+  -U, --mets-server-url URL       URL of a METS Server for parallel incremental access to METS
+                                  If URL starts with http:// start an HTTP server there,
+                                  otherwise URL is a path to an on-demand-created unix socket
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
-                                  Log level
+                                  Override log level globally [INFO]
+  --log-filename LOG-PATH         File to redirect stderr logging to (overriding ocrd_logging.conf).
+
+Options for information:
   -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
   -L, --list-resources            List names of processor resources
-  -J, --dump-json                 Dump tool description as JSON and exit
-  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
-  -h, --help                      This help message
+  -J, --dump-json                 Dump tool description as JSON
+  -D, --dump-module-dir           Show the 'module' resource location path for this processor
+  -h, --help                      Show this message
   -V, --version                   Show version
 
 Parameters:
@@ -268,7 +295,7 @@ Parameters:
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
-Usage: ocrd-skimage-denoise-raw [OPTIONS]
+Usage: ocrd-skimage-denoise-raw [worker|server] [OPTIONS]
 
   Denoise raw images with Scikit-image
 
@@ -294,27 +321,40 @@ Usage: ocrd-skimage-denoise-raw [OPTIONS]
   > Produce a new PAGE output file by serialising the resulting
   > hierarchy.
 
-Options:
+Subcommands:
+    worker      Start a processing worker rather than do local processing
+    server      Start a processor server rather than do local processing
+
+Options for processing:
+  -m, --mets URL-PATH             URL or file path of METS to process [./mets.xml]
+  -w, --working-dir PATH          Working directory of local workspace [dirname(URL-PATH)]
   -I, --input-file-grp USE        File group(s) used as input
   -O, --output-file-grp USE       File group(s) used as output
-  -g, --page-id ID                Physical page ID(s) to process
+  -g, --page-id ID                Physical page ID(s) to process instead of full document []
   --overwrite                     Remove existing output pages/images
-                                  (with --page-id, remove only those)
+                                  (with "--page-id", remove only those).
+                                  Short-hand for OCRD_EXISTING_OUTPUT=OVERWRITE
+  --debug                         Abort on any errors with full stack trace.
+                                  Short-hand for OCRD_MISSING_OUTPUT=ABORT
   --profile                       Enable profiling
-  --profile-file                  Write cProfile stats to this file. Implies --profile
+  --profile-file PROF-PATH        Write cProfile stats to PROF-PATH. Implies "--profile"
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
                                   taking precedence over --parameter
-  -m, --mets URL-PATH             URL or file path of METS to process
-  -w, --working-dir PATH          Working directory of local workspace
+  -U, --mets-server-url URL       URL of a METS Server for parallel incremental access to METS
+                                  If URL starts with http:// start an HTTP server there,
+                                  otherwise URL is a path to an on-demand-created unix socket
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
-                                  Log level
+                                  Override log level globally [INFO]
+  --log-filename LOG-PATH         File to redirect stderr logging to (overriding ocrd_logging.conf).
+
+Options for information:
   -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
   -L, --list-resources            List names of processor resources
-  -J, --dump-json                 Dump tool description as JSON and exit
-  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
-  -h, --help                      This help message
+  -J, --dump-json                 Dump tool description as JSON
+  -D, --dump-module-dir           Show the 'module' resource location path for this processor
+  -h, --help                      Show this message
   -V, --version                   Show version
 
 Parameters:
@@ -334,7 +374,7 @@ Parameters:
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
-Usage: ocrd-skimage-binarize [OPTIONS]
+Usage: ocrd-skimage-binarize [worker|server] [OPTIONS]
 
   Binarize images with Scikit-image
 
@@ -359,27 +399,40 @@ Usage: ocrd-skimage-binarize [OPTIONS]
   > Produce a new PAGE output file by serialising the resulting
   > hierarchy.
 
-Options:
+Subcommands:
+    worker      Start a processing worker rather than do local processing
+    server      Start a processor server rather than do local processing
+
+Options for processing:
+  -m, --mets URL-PATH             URL or file path of METS to process [./mets.xml]
+  -w, --working-dir PATH          Working directory of local workspace [dirname(URL-PATH)]
   -I, --input-file-grp USE        File group(s) used as input
   -O, --output-file-grp USE       File group(s) used as output
-  -g, --page-id ID                Physical page ID(s) to process
+  -g, --page-id ID                Physical page ID(s) to process instead of full document []
   --overwrite                     Remove existing output pages/images
-                                  (with --page-id, remove only those)
+                                  (with "--page-id", remove only those).
+                                  Short-hand for OCRD_EXISTING_OUTPUT=OVERWRITE
+  --debug                         Abort on any errors with full stack trace.
+                                  Short-hand for OCRD_MISSING_OUTPUT=ABORT
   --profile                       Enable profiling
-  --profile-file                  Write cProfile stats to this file. Implies --profile
+  --profile-file PROF-PATH        Write cProfile stats to PROF-PATH. Implies "--profile"
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
                                   taking precedence over --parameter
-  -m, --mets URL-PATH             URL or file path of METS to process
-  -w, --working-dir PATH          Working directory of local workspace
+  -U, --mets-server-url URL       URL of a METS Server for parallel incremental access to METS
+                                  If URL starts with http:// start an HTTP server there,
+                                  otherwise URL is a path to an on-demand-created unix socket
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
-                                  Log level
+                                  Override log level globally [INFO]
+  --log-filename LOG-PATH         File to redirect stderr logging to (overriding ocrd_logging.conf).
+
+Options for information:
   -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
   -L, --list-resources            List names of processor resources
-  -J, --dump-json                 Dump tool description as JSON and exit
-  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
-  -h, --help                      This help message
+  -J, --dump-json                 Dump tool description as JSON
+  -D, --dump-module-dir           Show the 'module' resource location path for this processor
+  -h, --help                      Show this message
   -V, --version                   Show version
 
 Parameters:
@@ -405,7 +458,7 @@ Parameters:
 To be used with [PAGE-XML](https://github.com/PRImA-Research-Lab/PAGE-XML) documents in an [OCR-D](https://ocr-d.de/en/about) annotation workflow.
 
 ```
-Usage: ocrd-skimage-denoise [OPTIONS]
+Usage: ocrd-skimage-denoise [worker|server] [OPTIONS]
 
   Denoise binarized images with Scikit-image
 
@@ -422,7 +475,8 @@ Usage: ocrd-skimage-denoise [OPTIONS]
   > deskewing), in binarized form.
 
   > Next, denoise the image by removing too small connected components
-  > with skimage.
+  > with skimage. (If ``protect`` is non-zero, then avoid removing
+  > specks near large connected components up to that distance.)
 
   > Then write the new image to the workspace along with the output
   > fileGrp, and using a file ID with suffix ``.IMG-DEN`` with further
@@ -431,27 +485,40 @@ Usage: ocrd-skimage-denoise [OPTIONS]
   > Produce a new PAGE output file by serialising the resulting
   > hierarchy.
 
-Options:
+Subcommands:
+    worker      Start a processing worker rather than do local processing
+    server      Start a processor server rather than do local processing
+
+Options for processing:
+  -m, --mets URL-PATH             URL or file path of METS to process [./mets.xml]
+  -w, --working-dir PATH          Working directory of local workspace [dirname(URL-PATH)]
   -I, --input-file-grp USE        File group(s) used as input
   -O, --output-file-grp USE       File group(s) used as output
-  -g, --page-id ID                Physical page ID(s) to process
+  -g, --page-id ID                Physical page ID(s) to process instead of full document []
   --overwrite                     Remove existing output pages/images
-                                  (with --page-id, remove only those)
+                                  (with "--page-id", remove only those).
+                                  Short-hand for OCRD_EXISTING_OUTPUT=OVERWRITE
+  --debug                         Abort on any errors with full stack trace.
+                                  Short-hand for OCRD_MISSING_OUTPUT=ABORT
   --profile                       Enable profiling
-  --profile-file                  Write cProfile stats to this file. Implies --profile
+  --profile-file PROF-PATH        Write cProfile stats to PROF-PATH. Implies "--profile"
   -p, --parameter JSON-PATH       Parameters, either verbatim JSON string
                                   or JSON file path
   -P, --param-override KEY VAL    Override a single JSON object key-value pair,
                                   taking precedence over --parameter
-  -m, --mets URL-PATH             URL or file path of METS to process
-  -w, --working-dir PATH          Working directory of local workspace
+  -U, --mets-server-url URL       URL of a METS Server for parallel incremental access to METS
+                                  If URL starts with http:// start an HTTP server there,
+                                  otherwise URL is a path to an on-demand-created unix socket
   -l, --log-level [OFF|ERROR|WARN|INFO|DEBUG|TRACE]
-                                  Log level
+                                  Override log level globally [INFO]
+  --log-filename LOG-PATH         File to redirect stderr logging to (overriding ocrd_logging.conf).
+
+Options for information:
   -C, --show-resource RESNAME     Dump the content of processor resource RESNAME
   -L, --list-resources            List names of processor resources
-  -J, --dump-json                 Dump tool description as JSON and exit
-  -D, --dump-module-dir           Output the 'module' directory with resources for this processor
-  -h, --help                      This help message
+  -J, --dump-json                 Dump tool description as JSON
+  -D, --dump-module-dir           Show the 'module' resource location path for this processor
+  -h, --help                      Show this message
   -V, --version                   Show version
 
 Parameters:
@@ -461,11 +528,27 @@ Parameters:
    "dpi" [number - 0]
     pixel density in dots per inch (overrides any meta-data in the
     images); disabled when zero
-   "maxsize" [number - 3]
+   "protect" [number - 0.0]
+    avoid removing fg specks near larger fg components by up to this
+    distance in pt
+   "maxsize" [number - 1.0]
     maximum component size of (bg holes or fg specks) noise in pt
 ```
 
 ## Testing
 
-none yet
+To install Python dependencies:
 
+    make deps-test
+
+Which is the equivalent of:
+
+    pip install -r requirements_test.txt
+
+To install this module, then do:
+
+    make test
+
+Which is the equivalent of:
+
+    pytest tests

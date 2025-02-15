@@ -50,3 +50,5 @@ coverage.xml
 
 # emacs bkup
 *~
+
+tests/assets

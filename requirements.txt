@@ -1,6 +1,7 @@
-ocrd>=2.18
+ocrd>=3.0
 click>=7.0
 scipy
 numpy>=1.17.0
 pillow>=7.1.2
 scikit-image>=0.17.2
+PyWavelets # separate since scikit-image 0.25
