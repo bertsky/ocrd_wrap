@@ -2,7 +2,7 @@ PYTHON = python3
 PIP = pip3
 PYTHONIOENCODING=utf8
 
-DOCKER_BASE_IMAGE = docker.io/ocrd/core:v3.0.3
+DOCKER_BASE_IMAGE = docker.io/ocrd/core:v3.1.0
 DOCKER_TAG = ocrd/wrap
 
 help:
@@ -67,4 +67,4 @@ docker:
 	--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 	-t $(DOCKER_TAG) .
 
-.PHONY: help deps deps-test install install-dev test docker
+.PHONY: help deps deps-test install install-dev build test docker
