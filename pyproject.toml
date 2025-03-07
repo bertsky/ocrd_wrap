@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel", "setuptools-ocrd"]
+
+[project]
+name = "ocrd_wrap"
+authors = [
+    {name = "Robert Sachunsky", email = "sachunsky@informatik.uni-leipzig.de"},
+]
+description = "OCR-D wrapper for arbitrary coords-preserving image operations"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+keywords = ["ocr", "ocr-d", "scikit-image"]
+
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
+# https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: MIT Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Text Processing",
+]
+
+[project.scripts]
+ocrd-preprocess-image = "ocrd_wrap.cli:ocrd_preprocess_image"
+ocrd-skimage-normalize = "ocrd_wrap.cli:ocrd_skimage_normalize"
+ocrd-skimage-denoise-raw = "ocrd_wrap.cli:ocrd_skimage_denoise_raw"
+ocrd-skimage-denoise = "ocrd_wrap.cli:ocrd_skimage_denoise"
+ocrd-skimage-binarize = "ocrd_wrap.cli:ocrd_skimage_binarize"
+
+[project.urls]
+Homepage = "https://github.com/bertsky/ocrd_wrap"
+Repository = "https://github.com/bertsky/ocrd_wrap.git"
+
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies.test = {file = ["requirements_test.txt"]}
+
+[tool.setuptools]
+packages = ["ocrd_wrap"]
+package-data = {"*" = ["*.json"]}
+
+[tool.pytest.ini_options]
+minversion = 6.0
+addopts = "--strict-markers"
+markers = [
+    "integration: integration tests",
+]
+
+
+[tool.mypy]
+plugins = ["numpy.typing.mypy_plugin"]
+
+ignore_missing_imports = true
+
+
+strict = true
+
+disallow_subclassing_any = false
+# ❗ error: Class cannot subclass "Processor" (has type "Any")
+disallow_any_generics = false
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+
+[tool.coverage.run]
+branch = true
+source = [
+    "ocrd_wrap"
+]
+concurrency = [
+    "thread",
+    "multiprocessing"
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if self\\.debug",
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+ignore_errors = true
+omit = [
+    "ocrd_wrap/cli.py"
+]
